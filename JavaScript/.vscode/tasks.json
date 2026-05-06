@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run 1_forEach.js",
+			"type": "shell",
+			"command": "node",
+			"args": [
+				"lab2CascavalJS/1_forEach.js"
+			]
+		}
+	]
+}

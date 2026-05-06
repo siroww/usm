@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CryptoBoard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="header">
+    <div class="header__logo">
+      <span class="logo-mark">◈</span>
+      <span class="logo-text">CryptoBoard</span>
+    </div>
+    <div class="header__controls">
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="Поиск монеты..." autocomplete="off" />
+      </div>
+      <select id="currencySelect" class="select">
+        <option value="usd">USD $</option>
+        <option value="eur">EUR €</option>
+        <option value="rub">RUB ₽</option>
+      </select>
+      <select id="sortSelect" class="select">
+        <option value="market_cap_desc">По капитализации</option>
+        <option value="price_desc">По цене ↓</option>
+      </select>
+      <button id="favBtn" class="btn-toggle" title="Показать избранные">★ Избранные</button>
+      <button id="refreshBtn" class="btn-refresh" title="Обновить данные">↻</button>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <div id="errorBanner" class="error-banner hidden">
+      Не удалось загрузить данные. <button onclick="retry()">Повторить</button>
+    </div>
+
+    <div id="grid" class="coins-grid"></div>
+
+    <div id="emptyState" class="empty-state hidden">
+      <span class="empty-icon">◎</span>
+      <p>Монеты не найдены</p>
+      <small>Попробуйте другой запрос</small>
+    </div>
+  </main>
+
+  <!-- Modal -->
+  <div id="modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <button class="modal-close" id="modalClose" aria-label="Закрыть">✕</button>
+      <div class="modal-header">
+        <img id="modalImg" src="" alt="" class="modal-coin-img" />
+        <div>
+          <h2 id="modalTitle" class="modal-coin-name"></h2>
+          <span id="modalSymbol" class="modal-coin-symbol"></span>
+        </div>
+        <button id="modalFavBtn" class="modal-fav-btn" title="В избранное">☆</button>
+      </div>
+      <div class="modal-stats">
+        <div class="stat-card">
+          <span class="stat-label">Цена</span>
+          <span class="stat-value" id="modalPrice"></span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">24ч изменение</span>
+          <span class="stat-value" id="modalChange"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script src="storage.js"></script>
+  <script src="format.js"></script>
+  <script src="render.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
