@@ -1,10 +1,10 @@
 #include <iostream>
 #include <clocale>
 
+using namespace std;
+
 // Прототип функции для сравнения кубов.
 void compareCubes();
-
-using namespace std;
 
 int main() {
     system("chcp 1251 > nul");
