@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Добавить книгу{% endblock %}
+
+{% block content %}
+<div class="form-page">
+  <h1>Добавить книгу</h1>
+
+  <form method="post" class="book-form" novalidate>
+
+    <div class="form-group {% if errors.title %}has-error{% endif %}">
+      <label for="title">Название *</label>
+      <input type="text" id="title" name="title"
+             value="{{ form_data.get('title', '') }}"
+             placeholder="Введите название книги"/>
+      {% if errors.title %}<span class="error-msg">{{ errors.title }}</span>{% endif %}
+    </div>
+
+    <div class="form-group {% if errors.author %}has-error{% endif %}">
+      <label for="author">Автор *</label>
+      <input type="text" id="author" name="author"
+             value="{{ form_data.get('author', '') }}"
+             placeholder="Имя автора"/>
+      {% if errors.author %}<span class="error-msg">{{ errors.author }}</span>{% endif %}
+    </div>
+
+    <div class="form-group {% if errors.genre %}has-error{% endif %}">
+      <label for="genre">Жанр *</label>
+      <input type="text" id="genre" name="genre"
+             value="{{ form_data.get('genre', '') }}"
+             placeholder="Например: Роман, Фэнтези, Детектив"/>
+      {% if errors.genre %}<span class="error-msg">{{ errors.genre }}</span>{% endif %}
+    </div>
+
+    <div class="form-row">
+      <div class="form-group {% if errors.pages %}has-error{% endif %}">
+        <label for="pages">Количество страниц *</label>
+        <input type="number" id="pages" name="pages" min="1"
+               value="{{ form_data.get('pages', '') }}"
+               placeholder="например: 320"/>
+        {% if errors.pages %}<span class="error-msg">{{ errors.pages }}</span>{% endif %}
+      </div>
+
+      <div class="form-group {% if errors.rating %}has-error{% endif %}">
+        <label for="rating">Рейтинг (0–10) *</label>
+        <input type="number" id="rating" name="rating" min="0" max="10" step="0.1"
+               value="{{ form_data.get('rating', '') }}"
+               placeholder="например: 8.5"/>
+        {% if errors.rating %}<span class="error-msg">{{ errors.rating }}</span>{% endif %}
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Сохранить книгу</button>
+      <a href="{{ url_for('books') }}" class="btn btn-outline">Отмена</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

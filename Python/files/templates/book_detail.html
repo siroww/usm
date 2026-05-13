@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="{{ url_for('books') }}">← Каталог</a>
+</div>
+
+<div class="detail-card">
+  <div class="detail-header">
+    <div>
+      <span class="badge badge-lg">{{ book.genre }}</span>
+      <h1>{{ book.title }}</h1>
+      <p class="detail-author">{{ book.author }}</p>
+    </div>
+    <div class="detail-rating">
+      <span class="star">★</span>
+      <span class="rating-num">{{ book.rating }}</span>
+      <span class="rating-max">/10</span>
+    </div>
+  </div>
+
+  <div class="detail-meta">
+    <div class="meta-item">
+      <span class="meta-label">Страниц</span>
+      <span class="meta-value">{{ book.pages }}</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Жанр</span>
+      <span class="meta-value">{{ book.genre }}</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Добавлена</span>
+      <span class="meta-value">{{ book.created_at }}</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">ID</span>
+      <span class="meta-value">#{{ book.id }}</span>
+    </div>
+  </div>
+
+  <div class="detail-actions">
+    <a href="{{ url_for('edit_book', book_id=book.id) }}" class="btn btn-primary">✎ Редактировать</a>
+    <form method="post" action="{{ url_for('delete_book', book_id=book.id) }}"
+          style="display:inline"
+          onsubmit="return confirm('Удалить эту книгу?')">
+      <button type="submit" class="btn btn-danger">✕ Удалить</button>
+    </form>
+    <a href="{{ url_for('books') }}" class="btn btn-outline">Назад к каталогу</a>
+  </div>
+</div>
+{% endblock %}

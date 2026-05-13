@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Каталог книг{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Каталог книг</h1>
+  <a href="{{ url_for('add_book') }}" class="btn btn-primary">+ Добавить</a>
+</div>
+
+<!-- Фильтрация и сортировка -->
+<form method="get" class="filter-bar">
+  <select name="genre" onchange="this.form.submit()">
+    <option value="">Все жанры</option>
+    {% for g in genres %}
+    <option value="{{ g }}" {% if g == genre_filter %}selected{% endif %}>{{ g }}</option>
+    {% endfor %}
+  </select>
+
+  <select name="sort" onchange="this.form.submit()">
+    <option value="created_at" {% if sort_by=='created_at' %}selected{% endif %}>По дате</option>
+    <option value="title"      {% if sort_by=='title'      %}selected{% endif %}>По названию</option>
+    <option value="author"     {% if sort_by=='author'     %}selected{% endif %}>По автору</option>
+    <option value="rating"     {% if sort_by=='rating'     %}selected{% endif %}>По рейтингу</option>
+    <option value="pages"      {% if sort_by=='pages'      %}selected{% endif %}>По страницам</option>
+  </select>
+
+  <select name="order" onchange="this.form.submit()">
+    <option value="desc" {% if order=='desc' %}selected{% endif %}>↓ По убыванию</option>
+    <option value="asc"  {% if order=='asc'  %}selected{% endif %}>↑ По возрастанию</option>
+  </select>
+
+  {% if genre_filter %}
+  <a href="{{ url_for('books') }}" class="btn btn-sm btn-outline">✕ Сбросить</a>
+  {% endif %}
+</form>
+
+{% if books %}
+<table class="table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Название</th>
+      <th>Автор</th>
+      <th>Жанр</th>
+      <th>Страниц</th>
+      <th>Рейтинг</th>
+      <th>Добавлена</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for book in books %}
+    <tr>
+      <td class="muted">{{ book.id }}</td>
+      <td><a href="{{ url_for('book_detail', book_id=book.id) }}" class="link">{{ book.title }}</a></td>
+      <td>{{ book.author }}</td>
+      <td><span class="badge">{{ book.genre }}</span></td>
+      <td>{{ book.pages }}</td>
+      <td class="rating {% if book.rating >= 9 %}high{% elif book.rating >= 7 %}mid{% else %}low{% endif %}">
+        ★ {{ book.rating }}
+      </td>
+      <td class="muted">{{ book.created_at }}</td>
+      <td>
+        <a href="{{ url_for('edit_book', book_id=book.id) }}" class="btn btn-sm btn-outline">✎</a>
+        <form method="post" action="{{ url_for('delete_book', book_id=book.id) }}"
+              style="display:inline"
+              onsubmit="return confirm('Удалить «{{ book.title }}»?')">
+          <button type="submit" class="btn btn-sm btn-danger">✕</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="empty-state">
+  <p>Книг не найдено.</p>
+  {% if genre_filter %}<a href="{{ url_for('books') }}" class="btn btn-outline">Показать все</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}
