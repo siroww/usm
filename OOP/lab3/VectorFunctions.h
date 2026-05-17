@@ -39,5 +39,3 @@ double Vector3D::cosBetween(const Vector3D& other) const {
 void Vector3D::print() const {
     std::cout << "(" << x << ", " << y << ", " << z << ")";
 }
-
-#endif
