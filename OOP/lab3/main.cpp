@@ -8,8 +8,11 @@
 #include <iostream>
 #include "Vector3D.h"
 #include "VectorFunctions.h"
+#include <windows.h>
+
 
 int main() {
+    SetConsoleOutputCP(CP_UTF8);
     // Создаем два вектора
     Vector3D v1(3.0, 4.0, 0.0);
     Vector3D v2(1.0, 2.0, 3.0);

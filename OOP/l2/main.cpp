@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <string>
+#include <windows.h>
+
 
 using namespace std;
 
@@ -58,6 +60,7 @@ public:
 };
 
 int main() {
+    SetConsoleOutputCP(CP_UTF8);
     // 2 куба (размер, толщина стенок, имя)
     Cube c1(12.0, 0.5, "Kub_A");
     Cube c2(18.0, 1.5, "Kub_B");
