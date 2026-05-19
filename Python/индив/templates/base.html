@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}BookShelf{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="{{ url_for('index') }}" class="nav-brand">📚 BookShelf</a>
+  <ul class="nav-links">
+    <li><a href="{{ url_for('index') }}" {% if request.endpoint=='index' %}class="active"{% endif %}>Главная</a></li>
+    <li><a href="{{ url_for('books') }}" {% if request.endpoint=='books' %}class="active"{% endif %}>Каталог</a></li>
+    <li><a href="{{ url_for('add_book') }}" {% if request.endpoint=='add_book' %}class="active"{% endif %}>+ Добавить</a></li>
+    <li><a href="{{ url_for('stats') }}" {% if request.endpoint=='stats' %}class="active"{% endif %}>Статистика</a></li>
+  </ul>
+</nav>
+
+<main class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+  <p>BookShelf &mdash; Лабораторная работа №7 &bull; Flask + SQLite</p>
+</footer>
+
+</body>
+</html>

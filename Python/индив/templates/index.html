@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}BookShelf — Главная{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-text">
+    <h1>Ваша личная<br/><em>библиотека</em></h1>
+    <p>Ведите учёт прочитанных книг, оценивайте и анализируйте свою коллекцию.</p>
+    <div class="hero-actions">
+      <a href="{{ url_for('books') }}" class="btn btn-primary">Смотреть каталог</a>
+      <a href="{{ url_for('add_book') }}" class="btn btn-outline">+ Добавить книгу</a>
+    </div>
+  </div>
+  <div class="hero-stat">
+    <span class="big-num">{{ total }}</span>
+    <span class="big-label">книг в коллекции</span>
+  </div>
+</section>
+
+<section class="section">
+  <h2 class="section-title">Недавно добавленные</h2>
+  <div class="cards-grid">
+    {% for book in recent %}
+    <a href="{{ url_for('book_detail', book_id=book.id) }}" class="card">
+      <div class="card-genre">{{ book.genre }}</div>
+      <div class="card-title">{{ book.title }}</div>
+      <div class="card-author">{{ book.author }}</div>
+      <div class="card-footer">
+        <span class="rating">★ {{ book.rating }}</span>
+        <span class="pages">{{ book.pages }} стр.</span>
+      </div>
+    </a>
+    {% else %}
+    <p class="empty">Пока книг нет. <a href="{{ url_for('add_book') }}">Добавьте первую!</a></p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

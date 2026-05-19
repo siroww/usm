@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Редактировать — {{ book.title }}{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+  <a href="{{ url_for('book_detail', book_id=book.id) }}">← {{ book.title }}</a>
+</div>
+
+<div class="form-page">
+  <h1>Редактировать книгу</h1>
+
+  <form method="post" class="book-form" novalidate>
+
+    <div class="form-group {% if errors.title %}has-error{% endif %}">
+      <label for="title">Название *</label>
+      <input type="text" id="title" name="title"
+             value="{{ form_data.get('title', book.title) }}"/>
+      {% if errors.title %}<span class="error-msg">{{ errors.title }}</span>{% endif %}
+    </div>
+
+    <div class="form-group {% if errors.author %}has-error{% endif %}">
+      <label for="author">Автор *</label>
+      <input type="text" id="author" name="author"
+             value="{{ form_data.get('author', book.author) }}"/>
+      {% if errors.author %}<span class="error-msg">{{ errors.author }}</span>{% endif %}
+    </div>
+
+    <div class="form-group {% if errors.genre %}has-error{% endif %}">
+      <label for="genre">Жанр *</label>
+      <input type="text" id="genre" name="genre"
+             value="{{ form_data.get('genre', book.genre) }}"/>
+      {% if errors.genre %}<span class="error-msg">{{ errors.genre }}</span>{% endif %}
+    </div>
+
+    <div class="form-row">
+      <div class="form-group {% if errors.pages %}has-error{% endif %}">
+        <label for="pages">Количество страниц *</label>
+        <input type="number" id="pages" name="pages" min="1"
+               value="{{ form_data.get('pages', book.pages) }}"/>
+        {% if errors.pages %}<span class="error-msg">{{ errors.pages }}</span>{% endif %}
+      </div>
+
+      <div class="form-group {% if errors.rating %}has-error{% endif %}">
+        <label for="rating">Рейтинг (0–10) *</label>
+        <input type="number" id="rating" name="rating" min="0" max="10" step="0.1"
+               value="{{ form_data.get('rating', book.rating) }}"/>
+        {% if errors.rating %}<span class="error-msg">{{ errors.rating }}</span>{% endif %}
+      </div>
+    </div>
+
+    <div class="form-group {% if errors.status %}has-error{% endif %}">
+      <label for="status">Статус книги *</label>
+      <select id="status" name="status">
+        <option value="">Выберите статус</option>
+        {% for status in status_options %}
+        <option value="{{ status }}" {% if status == form_data.get('status', book.status) %}selected{% endif %}>{{ status }}</option>
+        {% endfor %}
+      </select>
+      {% if errors.status %}<span class="error-msg">{{ errors.status }}</span>{% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="notes">Заметки / отзыв</label>
+      <textarea id="notes" name="notes" rows="4" placeholder="Добавьте собственные заметки или отзыв">{{ form_data.get('notes', book.notes) }}</textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+      <a href="{{ url_for('book_detail', book_id=book.id) }}" class="btn btn-outline">Отмена</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

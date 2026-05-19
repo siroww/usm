@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Статистика{% endblock %}
+
+{% block content %}
+<h1>Статистика коллекции</h1>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <span class="stat-num">{{ total }}</span>
+    <span class="stat-label">Всего книг</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-num">{{ avg_rating }}</span>
+    <span class="stat-label">Средний рейтинг</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-num">{{ avg_pages|int }}</span>
+    <span class="stat-label">Среднее кол-во страниц</span>
+  </div>
+  {% if max_rating %}
+  <div class="stat-card accent">
+    <span class="stat-num">★ {{ max_rating.rating }}</span>
+    <span class="stat-label">Лучшая книга</span>
+    <span class="stat-sub">{{ max_rating.title }}</span>
+  </div>
+  {% endif %}
+</div>
+
+<div class="stats-section">
+  <h2>По жанрам</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Жанр</th>
+        <th>Книг</th>
+        <th>Средний рейтинг</th>
+        <th>Доля</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in by_genre %}
+      <tr>
+        <td><span class="badge">{{ row.genre }}</span></td>
+        <td>{{ row.cnt }}</td>
+        <td class="rating {% if row.avg_r >= 9 %}high{% elif row.avg_r >= 7 %}mid{% else %}low{% endif %}">
+          ★ {{ row.avg_r }}
+        </td>
+        <td>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ (row.cnt / total * 100)|round|int }}%"></div>
+            <span>{{ (row.cnt / total * 100)|round|int }}%</span>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="stats-section">
+  <h2>Топ-5 книг по рейтингу</h2>
+  <ol class="top-list">
+    {% for book in top_books %}
+    <li>
+      <a href="{{ url_for('book_detail', book_id=book.id) }}" class="link">{{ book.title }}</a>
+      <span class="muted">— {{ book.author }}</span>
+      <span class="rating high">★ {{ book.rating }}</span>
+    </li>
+    {% endfor %}
+  </ol>
+</div>
+{% endblock %}

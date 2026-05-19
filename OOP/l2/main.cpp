@@ -50,7 +50,7 @@ public:
         return innerSide * innerSide * innerSide;
     }
 
-    void show() const override {
+    void show() const {
         Square::show();
         cout << "Tolshina stenok: " << thickness << " cm\n"
              << "Vnutrenniy ob'em (dlya vody): " << calculateVolume() << " cm^3\n" << endl;
