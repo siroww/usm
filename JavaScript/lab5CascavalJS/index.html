@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Учёт личных финансов</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Учёт личных финансов</h1>
+
+  <!-- Форма добавления транзакции -->
+  <form id="transaction-form">
+    <input type="number" id="amount" placeholder="Сумма (+ доход, - расход)" required />
+    <select id="category" required>
+      <option value="">-- Категория --</option>
+      <option value="Еда">Еда</option>
+      <option value="Транспорт">Транспорт</option>
+      <option value="Зарплата">Зарплата</option>
+      <option value="Развлечения">Развлечения</option>
+      <option value="Прочее">Прочее</option>
+    </select>
+    <input type="text" id="description" placeholder="Описание" required />
+    <button type="submit">Добавить</button>
+    <span id="form-error" class="error"></span>
+  </form>
+
+  <!-- Общий баланс -->
+  <div id="total-block">
+    Общий баланс: <strong id="total">0</strong> руб.
+  </div>
+
+  <!-- Таблица транзакций -->
+  <table id="transactions-table">
+    <thead>
+      <tr>
+        <th>Дата и Время</th>
+        <th>Категория</th>
+        <th>Описание</th>
+        <th>Действие</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+
+  <!-- Полное описание транзакции -->
+  <div id="detail-block">
+    <p id="detail-text">Нажмите на строку, чтобы увидеть подробности.</p>
+  </div>
+
+  <script type="module" src="src/index.js"></script>
+</body>
+</html>
