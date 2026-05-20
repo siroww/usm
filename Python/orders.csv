@@ -1,0 +1,6 @@
+order_id,order_date,category,item_name,price,quantity,discount,status,distance_km
+101,2026-05-01,Electronics,Laptop,1200.0,1,0.1,Delivered,15.5
+102,2026-05-02,Books,Python Guide,45.0,2,0.0,Delivered,4.0
+103,2026-05-03,Electronics,Smartphone,800.0,1,0.15,Returned,42.2
+104,2026-05-04,Clothing,Jeans,60.0,3,0.0,Delivered,8.5
+105,2026-05-05,Books,AI Handbook,,1,0.0,Delivered,12.0
