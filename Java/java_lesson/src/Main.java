@@ -1,24 +1,5 @@
 import java.util.Arrays;
 
-// Главный класс с методом main, чтобы IDE не ругалась на неиспользуемый код
-public class Main {
-    public static void main(String[] args) {
-        // Проверка работы всех конструкторов и методов
-        Student student1 = new Student();
-        student1.printInfo();
-
-        System.out.println("----------------");
-
-        Student student2 = new Student(0.2f, (byte) 110);
-        student2.printInfo();
-
-        System.out.println("----------------");
-
-        Student student3 = new Student(student2);
-        student3.printInfo();
-    }
-}
-
 // Класс Student без модификатора public, чтобы его можно было держать в одном файле
 class Student {
     String nickName;
@@ -26,6 +7,7 @@ class Student {
     byte IQ;           // 80…127
     int exams;
     int[] marks;       // динамический массив
+    static int nrStudent;
 
     // 1. Конструктор по умолчанию
     public Student() {
@@ -37,6 +19,7 @@ class Student {
         for (int i = 0; i < exams; i++) {
             marks[i] = 7;
         }
+        nrStudent++;
     }
 
     // 2. Конструктор с параметрами
@@ -49,6 +32,7 @@ class Student {
         for (int i = 0; i < exams; i++) {
             marks[i] = 8;
         }
+        nrStudent++;
     }
 
     // 3. Конструктор копирования
@@ -61,6 +45,7 @@ class Student {
         for (int i = 0; i < exams; i++) {
             marks[i] = prototype.marks[i];
         }
+        nrStudent++;
     }
 
     // Метод вывода информации
@@ -75,5 +60,45 @@ class Student {
         }
         System.out.println();
     }
+
+    public static void main( String[] sui ){
+        Student Artemii;
+        Artemii = new Student();
+
+        Student Seva = new Student(0.67f, (byte) 110);
+
+        Student Klon = new Student(Artemii);
+
+        Artemii.printInfo();
+        Klon.printInfo();
+
+        Student I2502[] = new Student[18];
+        for(int i=0;i<I2502.length;i+=3){
+            I2502[i] = new Student();
+            I2502[i+1] = new Student((float)(i+0.01), (byte)(100+i));
+            I2502[i+2] = new Student(I2502[i+1]);
+        }
+
+        for (int i=0; i<I2502.length; i++) {
+            I2502[i].printInfo();
+        }
+
+        // поиск самого маленького айкю у студента
+        Student minIQ = I2502[0];
+        for (int i=1; i<I2502.length; i++) {
+            if (I2502[i].IQ < minIQ.IQ){minIQ = I2502[i];};
+            System.out.println("sami min IQ");
+            minIQ.printInfo();
+        }
+        Student maxLeziness = I2502[0];
+        for (int i=1; i<I2502.length; i++) {
+            if (I2502[i].laziness > minIQ.laziness){maxLeziness = I2502[i];};
+            System.out.println("sami max laziness:");
+            maxLeziness.printInfo();
+        }
+        System.out.println("Students in Universitate:" + nrStudent);
+    }
+
+
 }
 
