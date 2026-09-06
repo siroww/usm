@@ -1,0 +1,105 @@
+Задание 4
+
+4.1. GET-запрос к http://sandbox.usm.com
+
+GET / HTTP/1.1
+Host: sandbox.usm.com
+User-Agent: Valeriu Chirica
+Accept: */*
+
+Что такое User-Agent и для чего он используется?
+User-Agent — это HTTP-заголовок запроса, содержащий текстовую строку с информацией о клиенте (название и версия браузера, операционная система, архитектура процессора).
+
+
+4.2. POST-запрос к http://sandbox.usm.com/cars
+
+HTTP
+POST /cars HTTP/1.1
+Host: sandbox.usm.com
+User-Agent: Valeriu Chirica
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 31
+
+make=Toyota&model=Corolla&year=2020
+
+Метод        Назначение                                                  Идемпотентность
+GET          Запросить и получить данные с сервера.                      Да
+POST         Отправить данные на сервер для создания нового ресурса.     Нет
+PUT          Полностью заменить/перезаписать существующий ресурс.        Да
+PATCH        Частично изменить существующий ресурс.                      Нет
+DELETE       Удалить указанный ресурс.                                   Да
+HEAD         Запросить только заголовки ответа (без передачи тела).      Да
+OPTIONS      Запросить поддерживаемые сервером методы и настройки CORS.  Да
+
+
+4.3. PUT-запрос к http://sandbox.usm.com/cars/1
+
+HTTP
+PUT /cars/1 HTTP/1.1
+Host: sandbox.usm.com
+User-Agent: Valeriu Chirica
+Content-Type: application/json
+Content-Length: 53
+
+{
+  "make": "Toyota",
+  "model": "Corolla",
+  "year": 2021
+}
+
+Ответ на контрольный вопрос: В чем разница между PATCH и PUT запросами?
+PUT: Передает полный объект. Сервер полностью заменяет имеющуюся запись новыми данными. Если при отправке запроса опустить одно из полей, оно может быть затерто или сброшено в значение по умолчанию (null).
+PATCH: Передает только изменяемые поля. Сервер обновляет исключительно переданные атрибуты, не затрагивая остальные свойства объекта в базе данных.
+
+
+4.4. Вариант ответа сервера на запрос с ошибкой формата
+Приведенный в условии запрос содержит синтаксическую ошибку и противоречие:
+
+HTTP
+POST /cars HTTP/1.1Host: sandbox.comContent-Type: application/jsonUser-Agent: John Doemodel=Corolla&make=Toyota&year=2020
+В заголовке указан Content-Type: application/json, но тело запроса передано в формате URL-encoded (model=Corolla&make=Toyota&year=2020), а не как валидный JSON-объект ({"model": "Corolla", ...}).
+
+В реальных условиях парсер сервера вернет ошибку валидации данных 400 Bad Request:
+
+HTTP
+HTTP/1.1 400 Bad Request
+Date: Sun, 06 Sep 2026 10:45:00 GMT
+Server: Apache/2.4.52 (Ubuntu)
+Content-Type: application/json; charset=utf-8
+Content-Length: 88
+
+{
+  "error": "Bad Request",
+  "message": "Content-Type is application/json, but body is not valid JSON string."
+}
+
+(Если бы тело запроса было передано валидным JSON, корректный ответ сервера на успешное создание ресурса выглядел бы так):
+
+HTTP
+HTTP/1.1 201 Created
+Location: /cars/101
+Content-Type: application/json; charset=utf-8
+
+{
+  "id": 101,
+  "make": "Toyota",
+  "model": "Corolla",
+  "year": 2020
+}
+
+
+4.5. Ситуации для кодов состояния HTTP
+
+200 OK: Запрос выполнен успешно, ресурс создан/обработан, и сервер возвращает данные объекта в теле ответа.
+
+201 Created: Запись о новом автомобиле успешно создана в базе данных (стандартный успешный ответ для метода POST).
+
+400 Bad Request: Несоответствие между заголовком Content-Type: application/json и форматом тела (или ошибки в синтаксисе JSON, или отсутствие обязательных полей).
+
+401 Unauthorized: Пользователь не авторизован (в запросе отсутствует сессионный токен/cookie или заголовок Authorization).
+
+403 Forbidden: Пользователь авторизован, но у него нет прав доступа для создания записей в бэкенде.
+
+404 Not Found: Эндпоинт /cars не существует или недоступен по указанному пути на сервере.
+
+500 Internal Server Error: Ошибка на стороне сервера (например, падение подключения к базе данных, синтаксическая ошибка в коде бэкенда при обработке тела).

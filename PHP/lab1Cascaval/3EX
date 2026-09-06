@@ -1,0 +1,44 @@
+Задание 3
+Анализ запроса к сайту GitHub (репозиторий https://github.com/siroww/usm)
+На основе данных из вкладки Network в DevTools:
+
+URL запроса (Request URL): https://github.com/siroww/usm
+
+Метод запроса (Request Method): GET
+
+Статус ответа (Status Code): 200 OK (страница успешно найдена и передана клиенту).
+
+Remote Address: 140.82.121.4:443 (IP-адрес сервера GitHub, соединение по защищённому порту HTTPS).
+
+Основные заголовки запроса (Request Headers)
+:path: /siroww/usm — относительный путь к запрашиваемому ресурсу на сервере.
+
+user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)... — содержит информацию об ОС пользователя (macOS) и браузере.
+
+accept-language: ru-RU,ru;q=0.9 — предпочитаемый язык пользователя (русский).
+
+cookie — содержит сессионные данные авторизации (включая имя вошедшего пользователя dotcom_user=siroww, временную зону tz=Europe/Chisinau, темы оформления и токены безопасности).
+
+sec-ch-ua-platform: "macOS" — заголовок Client Hints, уточняющий операционную систему.
+
+Основные заголовки ответа (Response Headers)
+content-type: text/html; charset=utf-8 — документ передан в формате HTML с кодировкой UTF-8.
+
+content-encoding: gzip — данные сжаты алгоритмом gzip перед отправкой по сети.
+
+cache-control: max-age=0, private, must-revalidate — указывает, что ответ содержит персональные данные пользователя (частный кэш) и его необходимо проверять на актуальность при каждом запросе.
+
+strict-transport-security: max-age=31536000; includeSubdomains; preload — политический заголовок HSTS, принудительно заставляющий браузер работать только по защищенному протоколу HTTPS.
+
+content-security-policy (CSP) — развернутый заголовок безопасности, определяющий доверенные источники для загрузки скриптов, стилей, изображений и подключения по WebSockets (защита от XSS и инъекций).
+
+x-frame-options: deny — запрещает отображение этой страницы внутри <iframe> на других сайтах (защита от Clickjacking).
+
+set-cookie: _gh_sess=...; path=/; secure; HttpOnly; SameSite=Lax — устанавливает сессионную куку с флагами безопасности (Secure, HttpOnly для защиты от чтения через JS, SameSite=Lax для защиты от CSRF).
+
+Тело запроса и ответа
+Тело запроса: Отсутствует (для метода GET параметры передаются только в URL).
+
+Тело ответа: HTML-код страницы репозитория со структурой файлов, README и элементами управления интерфейсом GitHub.
+
+SCREAN в папке lab1Cascaval/image2.png
