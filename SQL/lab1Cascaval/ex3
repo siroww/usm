@@ -1,0 +1,19 @@
+3. Примеры UPDATE и DELETE:
+
+-- Обновление 1: Изменение класса ученика
+UPDATE students 
+SET class_id = 2 
+WHERE student_id = 1;
+
+-- Обновление 2: Исправление оценки
+UPDATE grades 
+SET grade = 10 
+WHERE student_id = 1 AND subject_id = 2;
+
+-- Удаление 1: Удаление записи из расписания
+DELETE FROM schedules 
+WHERE schedule_id = 4;
+
+-- Удаление 2: Удаление оценки конкретного ученика
+DELETE FROM grades 
+WHERE student_id = 3 AND grade < 8;

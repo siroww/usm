@@ -1,0 +1,65 @@
+Часть 2. Модификация (ALTER), Индексы, DML
+1. Работа с ALTER TABLE:
+
+-- Добавление колонки
+ALTER TABLE students ADD COLUMN middle_name VARCHAR(50);
+
+-- Удаление колонки
+ALTER TABLE teachers DROP COLUMN phone;
+
+-- Изменение названия колонки (в MySQL: CHANGE/RENAME COLUMN)
+ALTER TABLE classrooms RENAME COLUMN capacity TO max_seats;
+
+-- Изменение типа данных
+ALTER TABLE students ALTER COLUMN middle_name TYPE VARCHAR(100);
+
+-- Добавление ограничения (CHECK)
+ALTER TABLE students ADD CONSTRAINT chk_birth_date CHECK (birth_date >= '2000-01-01');
+
+-- Создание индекса для ускорения поиска по фамилии
+CREATE INDEX idx_students_last_name ON students(last_name);
+
+
+2. Заполнение данных
+
+INSERT INTO teachers (first_name, last_name, email) VALUES
+('Мария', 'Иванова', 'm.ivanova@school.com'),
+('Алексей', 'Петров', 'a.petrov@school.com'),
+('Елена', 'Сидорова', 'e.sidorova@school.com'),
+('Дмитрий', 'Смирнов', 'd.smirnov@school.com');
+
+INSERT INTO classes (grade_level, letter, teacher_id) VALUES
+(9, 'А', 1),
+(9, 'Б', 2),
+(10, 'А', 3),
+(11, 'А', 4);
+
+INSERT INTO subjects (subject_name, teacher_id) VALUES
+('Математика', 1),
+('Физика', 2),
+('Литература', 3),
+('Информатика', 4);
+
+INSERT INTO classrooms (room_number, max_seats) VALUES
+('101', 30),
+('102', 25),
+('201', 30),
+('202', 20);
+
+INSERT INTO students (first_name, last_name, birth_date, class_id) VALUES
+('Иван', 'Ковалев', '2009-04-12', 1),
+('Анна', 'Морозова', '2009-08-23', 1),
+('Павел', 'Васильев', '2008-11-05', 3),
+('София', 'Михайлова', '2007-02-17', 4);
+
+INSERT INTO schedules (class_id, subject_id, classroom_id, day_of_week, lesson_number) VALUES
+(1, 1, 1, 1, 1),
+(1, 2, 2, 1, 2),
+(3, 3, 3, 1, 1),
+(4, 4, 4, 2, 3);
+
+INSERT INTO grades (student_id, subject_id, grade, grade_date) VALUES
+(1, 1, 9, '2026-09-01'),
+(1, 2, 8, '2026-09-02'),
+(2, 3, 10, '2026-09-01'),
+(3, 4, 7, '2026-09-03');

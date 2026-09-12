@@ -1,0 +1,86 @@
+Схема связей (3НФ)
+classes (Классы) — 1:N к students
+
+teachers (Учителя) — 1:N к classes (классное руководство) и subjects
+
+subjects (Предметы) — 1:N к schedules и grades
+
+students (Ученики) — 1:N к grades
+
+classrooms (Кабинеты) — 1:N к schedules
+
+schedules (Расписание) — Связующая таблица (N:N между classes, subjects, classrooms)
+
+grades (Оценки) — Связующая таблица (N:N между students и subjects)
+
+
+
+CREATE DATABASE school_db;
+\c school_db; -- Переключение на созданную БД (в PostgreSQL)
+
+-- 1. Учителя
+CREATE TABLE teachers (
+    teacher_id SERIAL PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone VARCHAR(20)
+);
+
+-- 2. Классы
+CREATE TABLE classes (
+    class_id SERIAL PRIMARY KEY,
+    grade_level INT NOT NULL CHECK (grade_level BETWEEN 1 AND 12),
+    letter CHAR(1) NOT NULL,
+    teacher_id INT UNIQUE, -- 1:1 / 1:N (классный руководитель)
+    FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id) ON DELETE SET NULL
+);
+
+-- 3. Предметы
+CREATE TABLE subjects (
+    subject_id SERIAL PRIMARY KEY,
+    subject_name VARCHAR(100) NOT NULL,
+    teacher_id INT,
+    FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id) ON DELETE CASCADE
+);
+
+-- 4. Кабинеты
+CREATE TABLE classrooms (
+    classroom_id SERIAL PRIMARY KEY,
+    room_number VARCHAR(10) NOT NULL UNIQUE,
+    capacity INT CHECK (capacity > 0)
+);
+
+-- 5. Ученики
+CREATE TABLE students (
+    student_id SERIAL PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    birth_date DATE NOT NULL,
+    class_id INT,
+    FOREIGN KEY (class_id) REFERENCES classes(class_id) ON DELETE SET NULL
+);
+
+-- 6. Расписание (N:N между классами, предметами и кабинетами)
+CREATE TABLE schedules (
+    schedule_id SERIAL PRIMARY KEY,
+    class_id INT NOT NULL,
+    subject_id INT NOT NULL,
+    classroom_id INT NOT NULL,
+    day_of_week INT CHECK (day_of_week BETWEEN 1 AND 6),
+    lesson_number INT CHECK (lesson_number BETWEEN 1 AND 8),
+    FOREIGN KEY (class_id) REFERENCES classes(class_id) ON DELETE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES subjects(subject_id) ON DELETE CASCADE,
+    FOREIGN KEY (classroom_id) REFERENCES classrooms(classroom_id) ON DELETE CASCADE
+);
+
+-- 7. Оценки (N:N между учениками и предметами)
+CREATE TABLE grades (
+    grade_id SERIAL PRIMARY KEY,
+    student_id INT NOT NULL,
+    subject_id INT NOT NULL,
+    grade INT NOT NULL CHECK (grade BETWEEN 1 AND 10),
+    grade_date DATE DEFAULT CURRENT_DATE,
+    FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES subjects(subject_id) ON DELETE CASCADE
+);
