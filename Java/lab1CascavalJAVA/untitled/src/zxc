@@ -1,104 +1,313 @@
-import java.util.Arrays;
+import java.io.*;
+import java.util.Random;
+//import java.util.Scanner;
 
-// Класс Student без модификатора public, чтобы его можно было держать в одном файле
-class Student {
-    String nickName;
-    float laziness;     // 0..1 - лень
-    byte IQ;           // 80…127
-    int exams;
-    int[] marks;       // динамический массив
-    static int nrStudent;
+public class PC {
+    // 1. Все поля делаем PRIVATE для защиты данных
+    private String nickName;
+    private Byte componentsCount;
+    private String[] nameModel;
+    private Float[] partWeights;
+    private Float[] releaseYears;
+    private Double[] partPrices;
+
+    private static int createdCompsCount = 0;
 
     // 1. Конструктор по умолчанию
-    public Student() {
-        nickName = "oleg";
-        laziness = (float) 0.5;    // 0.5f
-        IQ = (byte) 127;
-        exams = 6;
-        marks = new int[exams];
-        for (int i = 0; i < exams; i++) {
-            marks[i] = 7;
-        }
-        nrStudent++;
+    public PC() {
+        nickName = "NoName";
+        componentsCount = 0;
+
+        nameModel = new String[0];
+        partWeights = new Float[0];
+        releaseYears = new Float[0];
+        partPrices = new Double[0];
+
+        createdCompsCount++; // ИСПРАВЛЕНО: было componentsCount++
     }
 
     // 2. Конструктор с параметрами
-    public Student(float laziness, byte IQ) {
-        nickName = "artem";
-        this.laziness = laziness;
-        this.IQ = IQ;
-        exams = 18;
-        marks = new int[exams];
-        for (int i = 0; i < exams; i++) {
-            marks[i] = 8;
+    public PC(String nickName, Byte componentsCount, String[] nameModel, float[] partWeights,
+              float[] releaseYears, double[] partPrices) {
+        this.nickName = nickName;
+        this.componentsCount = componentsCount;
+
+        this.nameModel = new String[componentsCount];
+        this.partWeights = new Float[componentsCount];
+        this.releaseYears = new Float[componentsCount];
+        this.partPrices = new Double[componentsCount];
+
+        for (int i = 0; i < componentsCount; i++) {
+            this.nameModel[i] = nameModel[i];
+            this.partWeights[i] = partWeights[i];
+            this.releaseYears[i] = releaseYears[i];
+            this.partPrices[i] = partPrices[i];
         }
-        nrStudent++;
+
+        createdCompsCount++;
     }
 
     // 3. Конструктор копирования
-    public Student(Student prototype) {
-        nickName = prototype.nickName;
-        laziness = prototype.laziness;
-        IQ = prototype.IQ;
-        exams = prototype.exams;
-        marks = new int[exams];
-        for (int i = 0; i < exams; i++) {
-            marks[i] = prototype.marks[i];
+    public PC(PC prototype) {
+        this.nickName = prototype.nickName;
+        this.componentsCount = prototype.componentsCount;
+
+        this.nameModel = new String[prototype.componentsCount];
+        this.partWeights = new Float[prototype.componentsCount];
+        this.releaseYears = new Float[prototype.componentsCount];
+        this.partPrices = new Double[prototype.componentsCount];
+
+        for (int i = 0; i < componentsCount; i++) {
+            this.nameModel[i] = prototype.nameModel[i];
+            this.partWeights[i] = prototype.partWeights[i];
+            this.releaseYears[i] = prototype.releaseYears[i];
+            this.partPrices[i] = prototype.partPrices[i];
         }
-        nrStudent++;
+
+        createdCompsCount++;
     }
 
-    // Метод вывода информации
+    // --- Методы set() и get() ---
+    public String getNickName() { return nickName; }
+    public void setNickName(String nickName) { this.nickName = nickName; }
+
+    public byte getComponentsCount() { return componentsCount; }
+
+    public String[] getNameModel() { return nameModel; }
+    public void setNameModel(String[] nameModel) { this.nameModel = nameModel; }
+
+    public Float[] getPartWeights() { return partWeights; }
+    public void setPartWeights(Float[] partWeights) { this.partWeights = partWeights; }
+
+    public Float[] getReleaseYears() { return releaseYears; }
+    public void setReleaseYears(Float[] releaseYears) { this.releaseYears = releaseYears; }
+
+    public Double[] getPartPrices() { return partPrices; }
+    public void setPartPrices(Double[] partPrices) { this.partPrices = partPrices; }
+
+    public static int getCreatedCompsCount() { return createdCompsCount; }
+
+    // Печать всей технической информации
     public void printInfo() {
-        System.out.println("Student’s nick: " + nickName);
-        System.out.println("Laziness: " + laziness);
-        System.out.println("IQ: " + IQ);
-        System.out.println("Exams: " + exams);
-        System.out.print("Marks: ");
-        for (int i = 0; i < exams; i++) {
-            System.out.print(marks[i] + " ");
+        System.out.println("==============================================");
+        System.out.println("Владелец ПК:        " + nickName);
+        System.out.println("Количество деталей: " + componentsCount);
+        System.out.println("--- Список деталей ---");
+        for (int i = 0; i < componentsCount; i++) {
+            System.out.println("  [" + (i + 1) + "] " + nameModel[i] +
+                    " | Вес: " + partWeights[i] + " кг" +
+                    " | Год: " + releaseYears[i].intValue() +
+                    " | Цена: " + partPrices[i] + " $");
         }
-        System.out.println();
+        System.out.println("Общий вес: " + getTotalWeight() + " кг");
+        System.out.println("Общая стоимость: " + getTotalPrice() + " $");
+        System.out.println("Средний год выпуска: " + getAverageReleaseYear());
+        System.out.println("==============================================");
     }
 
-    public static void main( String[] sui ){
-        Student Artemii;
-        Artemii = new Student();
+    // Расчет общей стоимости
+    public double getTotalPrice() {
+        double total = 0;
+        for (double price : partPrices) total += price;
+        return total;
+    }
 
-        Student Seva = new Student(0.67f, (byte) 110);
+    // Расчет общего веса
+    public float getTotalWeight() {
+        float total = 0;
+        for (float weight : partWeights) total += weight;
+        return total;
+    }
 
-        Student Klon = new Student(Artemii);
-
-        Artemii.printInfo();
-        Klon.printInfo();
-
-        Student I2502[] = new Student[18];
-        for(int i=0;i<I2502.length;i+=3){
-            I2502[i] = new Student();
-            I2502[i+1] = new Student((float)(i+0.01), (byte)(100+i));
-            I2502[i+2] = new Student(I2502[i+1]);
-        }
-
-        for (int i=0; i<I2502.length; i++) {
-            I2502[i].printInfo();
-        }
-
-        // поиск самого маленького айкю у студента
-        Student minIQ = I2502[0];
-        for (int i=1; i<I2502.length; i++) {
-            if (I2502[i].IQ < minIQ.IQ){minIQ = I2502[i];};
-            System.out.println("sami min IQ");
-            minIQ.printInfo();
-        }
-        Student maxLeziness = I2502[0];
-        for (int i=1; i<I2502.length; i++) {
-            if (I2502[i].laziness > minIQ.laziness){maxLeziness = I2502[i];};
-            System.out.println("sami max laziness:");
-            maxLeziness.printInfo();
-        }
-        System.out.println("Students in Universitate:" + nrStudent);
+    // Средний год выпуска
+    public float getAverageReleaseYear() {
+        if (componentsCount == 0) return 0;
+        float sumYears = 0;
+        for (float year : releaseYears) sumYears += year;
+        return sumYears / componentsCount;
     }
 
 
+    public static String inStreang() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            return reader.readLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String inString() {
+        return inStreang();
+    }
+
+    public static double inDouble() {
+        return Double.valueOf(inStreang());
+    }
+
+    public static float inFloat() {
+        return Float.parseFloat(inStreang());
+    }
+
+    public static byte inByte() {
+        return Byte.parseByte(inStreang());
+    }
+
+    public void readFromKeyboard() {
+        System.out.print("Введите имя компьютера (nickName): ");
+        this.nickName = inString();
+
+        System.out.print("Введите количество комплектующих: ");
+        this.componentsCount = inByte();
+
+        // Пересоздаём массивы под введённый размер
+        this.nameModel = new String[this.componentsCount];
+        this.partWeights = new Float[this.componentsCount];
+        this.releaseYears = new Float[this.componentsCount];
+        this.partPrices = new Double[this.componentsCount];
+
+        for (int i = 0; i < this.componentsCount; i++) {
+            System.out.println("\n--- Деталь #" + (i + 1) + " ---");
+
+            System.out.print("Название модели: ");
+            this.nameModel[i] = inString();
+
+            System.out.print("Вес детали: ");
+            do {
+                System.out.print("Вес детали: ");
+                this.partWeights[i] = inFloat();
+            } while (partWeights[i]<=0||partWeights[i]>5);
+
+
+            System.out.print("Год выпуска: ");
+            this.releaseYears[i] = inFloat();
+
+            System.out.print("Цена детали: ");
+            this.partPrices[i] = inDouble();
+        }
+
+        createdCompsCount++;
+    }
+
+
+    // Заполнение объекта случайными значениями
+    public void fillRandom() {
+        Random rand = new Random();
+        String[] names = {"Алексей", "Дмитрий", "Елена", "Мария", "Сергей", "Иван"};
+        String[] sampleParts = {"CPU Intel", "GPU NVIDIA", "RAM Kingston", "SSD Samsung", "Motherboard ASUS", "PSU Corsair"};
+
+        this.nickName = names[rand.nextInt(names.length)];
+        this.componentsCount = (byte) (3 + rand.nextInt(4));
+
+        this.nameModel = new String[this.componentsCount];
+        this.partWeights = new Float[this.componentsCount];
+        this.releaseYears = new Float[this.componentsCount];
+        this.partPrices = new Double[this.componentsCount];
+
+        for (int i = 0; i < this.componentsCount; i++) {
+            this.nameModel[i] = sampleParts[rand.nextInt(sampleParts.length)] + " v" + (i + 1);
+            this.partWeights[i] = 0.2f + rand.nextFloat() * 2.5f;
+            this.releaseYears[i] = 2015f + rand.nextFloat() * 11f; // ИСПРАВЛЕНО: совместимо со всеми версиями Java
+            this.partPrices[i] = 50.0 + rand.nextDouble() * 450.0;
+        }
+    }
+
+    // Сравнение 2-х компьютеров и апгрейд
+    public void compareAndUpgradeRelevance(PC other) {
+        float avg1 = this.getAverageReleaseYear();
+        float avg2 = other.getAverageReleaseYear();
+
+        if (avg1 == avg2) {
+            System.out.println("Компьютеры одинаковой актуальности.");
+            return;
+        }
+
+        PC oldest = (avg1 < avg2) ? this : other;
+
+        System.out.println("\nДо апгрейда:");
+        oldest.printInfo();
+
+        for (int i = 0; i < oldest.componentsCount; i++) {
+            oldest.releaseYears[i] = 2026f;
+            oldest.partPrices[i] += 100.0;
+        }
+
+        System.out.println("\nПосле апгрейда:");
+        oldest.printInfo();
+    }
+
+    // Сравнение 2-х компьютеров по весу
+    public static void compareWeight(PC c1, PC c2) {
+        float w1 = c1.getTotalWeight();
+        float w2 = c2.getTotalWeight();
+
+        System.out.println("\n=== Сравнение по весу ===");
+        System.out.printf("ПК (%s): %.2f кг | ПК (%s): %.2f кг\n", c1.getNickName(), w1, c2.getNickName(), w2);
+
+        if (w1 > w2) {
+            System.out.printf("Компьютер %s тяжелее компьютера %s на %.2f кг.\n", c1.getNickName(), c2.getNickName(), (w1 - w2));
+        } else if (w2 > w1) {
+            System.out.printf("Компьютер %s тяжелее компьютера %s на %.2f кг.\n", c2.getNickName(), c1.getNickName(), (w2 - w1));
+        } else {
+            System.out.println("Оба компьютера имеют одинаковый вес.");
+        }
+    }
+
+    // Сохранение в файл
+    public void saveToFile(String filename) {
+        try (PrintWriter writer = new PrintWriter(filename)) {
+            writer.println(nickName);
+            writer.println(componentsCount);
+
+            for (int i = 0; i < componentsCount; i++) {
+                writer.println(nameModel[i]);
+                writer.println(partWeights[i]);
+                writer.println(releaseYears[i]);
+                writer.println(partPrices[i]);
+            }
+            System.out.println("Данные объекта успешно сохранены в файл: " + filename);
+        } catch (FileNotFoundException e) {
+            System.err.println("Ошибка при сохранении в файл " + filename + ": " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        PC c1 = new PC();
+        c1.fillRandom();
+        c1.printInfo();
+
+        PC c2 = new PC("Иван", (byte) 2,
+                new String[]{"SSD", "RAM"}, new float[]{0.1f, 0.05f}, new float[]{2019f, 2021f}, new double[]{80.0, 60.0});
+        c2.printInfo();
+
+        // Сеть компов
+        PC[] network = new PC[]{c1, c2, new PC(c2)};
+
+        System.out.println("\n--- Информация о сети ---");
+        for (PC c : network) {
+            c.printInfo();
+        }
+
+        PC.compareWeight(c1, c2);
+        c1.compareAndUpgradeRelevance(c2);
+
+        // Поиск самого дорогого
+        PC expensive = network[0];
+        for (PC c : network) {
+            if (c.getTotalPrice() > expensive.getTotalPrice()) {
+                expensive = c;
+            }
+        }
+        System.out.println("\nСамый дорогой ПК принадлежит: " + expensive.getNickName() + " (" + expensive.getTotalPrice() + " $)");
+
+        // Сохранение файла
+        c1.saveToFile("comp.txt");
+
+        System.out.println("\nЧисло созданных компов: " + PC.getCreatedCompsCount());
+//
+//        PC c3 = new PC();
+//        c3.readFromKeyboard();
+//
+//        c3.saveToFile("comp.txt");
+    }
 }
-

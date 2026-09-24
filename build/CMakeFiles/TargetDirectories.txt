@@ -1,0 +1,3 @@
+/Users/sirow/Desktop/usm/build/CMakeFiles/Cryptography.dir
+/Users/sirow/Desktop/usm/build/CMakeFiles/edit_cache.dir
+/Users/sirow/Desktop/usm/build/CMakeFiles/rebuild_cache.dir

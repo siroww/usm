@@ -1,7 +1,8 @@
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import com.sun.jdi.event.StepEvent;
+
+import java.io.*;
 import java.util.Random;
-import java.util.Scanner;
+//import java.util.Scanner;
 
 public class PC {
     // 1. Все поля делаем PRIVATE для защиты данных
@@ -12,24 +13,35 @@ public class PC {
     private Float[] releaseYears;
     private Double[] partPrices;
 
+    private int ID;
+    private String Color;
+    private int Power;
+    private String OC;
+
+
     private static int createdCompsCount = 0;
 
     // 1. Конструктор по умолчанию
     public PC() {
-        nickName = "NoName";
+        this.nickName = "NoName";
         componentsCount = 0;
 
-        nameModel = new String[0];
-        partWeights = new Float[0];
-        releaseYears = new Float[0];
-        partPrices = new Double[0];
+        this.nameModel = new String[0];
+        this.partWeights = new Float[0];
+        this.releaseYears = new Float[0];
+        this.partPrices = new Double[0];
 
-        createdCompsCount++; // ИСПРАВЛЕНО: было componentsCount++
+        this.ID = 0;
+        this.Color = "NON-color";
+        this.Power = 0;
+        this.OC = "NON-OC";
+
+        createdCompsCount++;
     }
 
     // 2. Конструктор с параметрами
     public PC(String nickName, Byte componentsCount, String[] nameModel, float[] partWeights,
-              float[] releaseYears, double[] partPrices) {
+              float[] releaseYears, double[] partPrices, int ID, String Color, int Power, String OC) {
         this.nickName = nickName;
         this.componentsCount = componentsCount;
 
@@ -44,6 +56,11 @@ public class PC {
             this.releaseYears[i] = releaseYears[i];
             this.partPrices[i] = partPrices[i];
         }
+
+        this.ID = ID;
+        this.Color = (Color == null || Color.trim().isEmpty())? "NON-color" : Color ;
+        this.Power = Power ;
+        this.OC = (OC == null || OC.trim().isEmpty())? "NON-OC" : OC ;
 
         createdCompsCount++;
     }
@@ -65,6 +82,11 @@ public class PC {
             this.partPrices[i] = prototype.partPrices[i];
         }
 
+        this.ID = prototype.ID;
+        this.Color = prototype.Color;
+        this.Power = prototype.Power;
+        this.OC = prototype.OC;
+
         createdCompsCount++;
     }
 
@@ -85,6 +107,19 @@ public class PC {
 
     public Double[] getPartPrices() { return partPrices; }
     public void setPartPrices(Double[] partPrices) { this.partPrices = partPrices; }
+
+    public int getID() { return ID; }
+    public void setID(int ID) { this.ID = ID; }
+
+    public String getColor() { return Color; }
+    public void setColor( String Color) { this.Color = Color; }
+
+    public int getPower() { return Power; }
+    public void setPower( int Power ) { this.Power = Power; }
+
+    public String getOC() { return OC; }
+    public void setOC( String OC ) { this.OC = OC; }
+
 
     public static int getCreatedCompsCount() { return createdCompsCount; }
 
@@ -128,33 +163,102 @@ public class PC {
         return sumYears / componentsCount;
     }
 
-    // Считывание с клавиатуры через Scanner
-    public void readFromKeyboard() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Введите имя владельца: ");
-        this.nickName = scanner.nextLine();
 
-        System.out.print("Введите число деталей: ");
-        this.componentsCount = scanner.nextByte();
-        scanner.nextLine();
+    public static String inStreang() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            return reader.readLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    public static String inString() {
+        return inStreang();
+    }
+
+    public static double inDouble() {
+        return Double.valueOf(inStreang());
+    }
+
+    public static float inFloat() {
+        return Float.parseFloat(inStreang());
+    }
+
+    public static byte inByte() {
+        return Byte.parseByte(inStreang());
+    }
+
+    public void readFromKeyboardPC() {
+        System.out.print("Введите имя компьютера (nickName): ");
+        this.nickName = inString();
+
+        System.out.print("Введите количество комплектующих: ");
+        this.componentsCount = inByte();
+
+        // Пересоздаём массивы под введённый размер
         this.nameModel = new String[this.componentsCount];
         this.partWeights = new Float[this.componentsCount];
         this.releaseYears = new Float[this.componentsCount];
         this.partPrices = new Double[this.componentsCount];
 
         for (int i = 0; i < this.componentsCount; i++) {
-            System.out.println("--- Деталь " + (i + 1) + " ---");
-            System.out.print(" Название: ");
-            this.nameModel[i] = scanner.nextLine();
-            System.out.print(" Вес (кг): ");
-            this.partWeights[i] = scanner.nextFloat();
-            System.out.print(" Год выпуска: ");
-            this.releaseYears[i] = scanner.nextFloat();
-            System.out.print(" Стоимость ($): ");
-            this.partPrices[i] = scanner.nextDouble();
-            scanner.nextLine();
+            System.out.println("\n--- Деталь #" + (i + 1) + " ---");
+
+            System.out.print("Название модели: ");
+            this.nameModel[i] = inString();
+
+            System.out.print("Вес детали: ");
+            do {
+                System.out.print("Вес детали: ");
+                this.partWeights[i] = inFloat();
+            } while (partWeights[i]<=0||partWeights[i]>5);
+
+
+            System.out.print("Год выпуска: ");
+            this.releaseYears[i] = inFloat();
+
+            System.out.print("Цена детали: ");
+            this.partPrices[i] = inDouble();
         }
+
+        createdCompsCount++;
+    }
+
+    // Добавление элемента
+    public void addNewComponents(String name, float weight, float year, double price){
+        int oldComponentsCoubt = componentsCount;
+        int newComponentsCount = oldComponentsCoubt + 1;
+
+        String[] newNameModel = new String[newComponentsCount];
+        Float[] newPartWeights = new Float[newComponentsCount];
+        Float[] newReleaseYears = new Float[newComponentsCount];
+        Double[] newPartPrices = new Double[newComponentsCount];
+
+        for (int i = 0; i < oldComponentsCoubt; i++){
+            newNameModel[i] = nameModel[i];
+            newPartWeights[i] = partWeights[i];
+            newReleaseYears[i] = releaseYears[i];
+            newPartPrices[i] = partPrices[i];
+        }
+        newNameModel[oldComponentsCoubt] = name;
+        newPartWeights[oldComponentsCoubt] = weight;
+        newReleaseYears[oldComponentsCoubt] = year;
+        newPartPrices[oldComponentsCoubt] = price;
+
+        newNameModel[oldComponentsCoubt] = name;
+        newPartWeights[oldComponentsCoubt] = weight;
+        newReleaseYears[oldComponentsCoubt] = year;
+        newPartPrices[oldComponentsCoubt] = price;
+
+        nameModel = newNameModel;
+        partWeights = newPartWeights;
+        releaseYears = newReleaseYears;
+        partPrices = newPartPrices;
+        componentsCount = (byte) newComponentsCount;
+
+        System.out.println("Деталь \"" + name + "\" добавлена.");
+
     }
 
     // Заполнение объекта случайными значениями
@@ -243,9 +347,21 @@ public class PC {
         c1.fillRandom();
         c1.printInfo();
 
-        PC c2 = new PC("Иван", (byte) 2,
-                new String[]{"SSD", "RAM"}, new float[]{0.1f, 0.05f}, new float[]{2019f, 2021f}, new double[]{80.0, 60.0});
+        PC c2 = new PC(
+                "Alex",                        // nickName
+                (byte) 2,                      // componentsCount
+                new String[]{"CPU", "GPU"},    // nameModel
+                new float[]{0.3f, 0.8f},       // partWeights
+                new float[]{2020f, 2023f},     // releaseYears
+                new double[]{150.0, 500.0},    // partPrices
+                0,                           // ID
+                " ",                       // Color
+                0,                           // Power
+                " "                   // OC
+        );
         c2.printInfo();
+
+        PC c3 = new PC(c2);
 
         // Сеть компов
         PC[] network = new PC[]{c1, c2, new PC(c2)};
@@ -268,8 +384,16 @@ public class PC {
         System.out.println("\nСамый дорогой ПК принадлежит: " + expensive.getNickName() + " (" + expensive.getTotalPrice() + " $)");
 
         // Сохранение файла
-        c2.saveToFile("comp_ivan.txt");
+        c1.saveToFile("comp.txt");
 
         System.out.println("\nЧисло созданных компов: " + PC.getCreatedCompsCount());
+//
+//        PC c4 = new PC();
+//        c4.readFromKeyboard();
+//
+//        c4.saveToFile("comp.txt");
+
+
+
     }
 }

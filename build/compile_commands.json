@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/Users/sirow/Desktop/usm/build",
+  "command": "/usr/bin/c++   -g -std=gnu++20 -o CMakeFiles/Cryptography.dir/main.cpp.o -c /Users/sirow/Desktop/usm/Cryptography/main.cpp",
+  "file": "/Users/sirow/Desktop/usm/Cryptography/main.cpp",
+  "output": "CMakeFiles/Cryptography.dir/main.cpp.o"
+}
+]

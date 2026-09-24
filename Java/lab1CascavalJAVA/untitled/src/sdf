@@ -1,253 +1,161 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.time.Year;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
 import java.util.Random;
-import java.util.Scanner;
+//import java.util.Scanner;
 
-// Убран модификатор public, теперь класс может находиться в любом файле
-class Comp {
-    private String ownerName;
-    private byte componentsCount;
-    private String[] partNames;
-    private float[] partWeights;
-    private float[] releaseYears;
-    private double[] partPrices;
+public class PC {
+    // 1. Все поля делаем PRIVATE для защиты данных
+    private String nickName;
+    private Byte componentsCount;
+    private String[] nameModel;
+    private Float[] partWeights;
+    private Float[] releaseYears;
+    private Double[] partPrices;
+
+    // --- Необязательные поля (могут быть не заданы, значение по умолчанию null) ---
+    private Integer uniqueNumber; // уникальный номер ПК
+    private String color;         // цвет корпуса
+    private Integer power;        // мощность блока питания, Вт
+    private String os;            // операционная система
 
     private static int createdCompsCount = 0;
+    private static int nextUniqueNumber = 1; // счётчик для автогенерации уникального номера
 
-    private String id;
-    private String color;
-    private String os;
+    // 1. Конструктор по умолчанию
+    public PC() {
+        nickName = "NoName";
+        componentsCount = 0;
 
-    public Comp() {
-        this.ownerName = "Неизвестен";
-        this.id = "ID-0000";
-        this.color = "Черный";
-        this.os = "FreeDOS";
-        this.componentsCount = 0;
+        nameModel = new String[0];
+        partWeights = new Float[0];
+        releaseYears = new Float[0];
+        partPrices = new Double[0];
 
-        this.partNames = new String[0];
-        this.partWeights = new float[0];
-        this.releaseYears = new float[0];
-        this.partPrices = new double[0];
+        this.uniqueNumber = nextUniqueNumber++;
+        // color, power, os намеренно не задаются — остаются null, пока не установлены явно
 
         createdCompsCount++;
     }
 
-    public Comp(String ownerName, String id, String color, String os, byte componentsCount) {
-        this.ownerName = ownerName;
-        this.id = id;
-        this.color = color;
-        this.os = os;
+    // 2. Конструктор с параметрами
+    public PC(String nickName, Byte componentsCount, String[] nameModel, float[] partWeights,
+              float[] releaseYears, double[] partPrices) {
+        this.nickName = nickName;
         this.componentsCount = componentsCount;
 
-        this.partNames = new String[componentsCount];
-        this.partWeights = new float[componentsCount];
-        this.releaseYears = new float[componentsCount];
-        this.partPrices = new double[componentsCount];
-
-        createdCompsCount++;
-    }
-
-    public Comp(String ownerName, String id, String color, String os, byte componentsCount,
-                String[] partNames, float[] partWeights, float[] releaseYears, double[] partPrices) {
-        this.ownerName = ownerName;
-        this.id = id;
-        this.color = color;
-        this.os = os;
-        this.componentsCount = componentsCount;
-
-        this.partNames = new String[componentsCount];
-        this.partWeights = new float[componentsCount];
-        this.releaseYears = new float[componentsCount];
-        this.partPrices = new double[componentsCount];
+        this.nameModel = new String[componentsCount];
+        this.partWeights = new Float[componentsCount];
+        this.releaseYears = new Float[componentsCount];
+        this.partPrices = new Double[componentsCount];
 
         for (int i = 0; i < componentsCount; i++) {
-            this.partNames[i] = partNames[i];
+            this.nameModel[i] = nameModel[i];
             this.partWeights[i] = partWeights[i];
             this.releaseYears[i] = releaseYears[i];
             this.partPrices[i] = partPrices[i];
         }
 
+        this.uniqueNumber = nextUniqueNumber++;
+
         createdCompsCount++;
     }
 
-    public Comp(Comp other) {
-        this.ownerName = other.ownerName;
-        this.id = other.id;
-        this.color = other.color;
-        this.os = other.os;
-        this.componentsCount = other.componentsCount;
+    // 3. Конструктор копирования
+    public PC(PC prototype) {
+        this.nickName = prototype.nickName;
+        this.componentsCount = prototype.componentsCount;
 
-        this.partNames = new String[this.componentsCount];
-        this.partWeights = new float[this.componentsCount];
-        this.releaseYears = new float[this.componentsCount];
-        this.partPrices = new double[this.componentsCount];
+        this.nameModel = new String[prototype.componentsCount];
+        this.partWeights = new Float[prototype.componentsCount];
+        this.releaseYears = new Float[prototype.componentsCount];
+        this.partPrices = new Double[prototype.componentsCount];
 
-        for (int i = 0; i < this.componentsCount; i++) {
-            this.partNames[i] = other.partNames[i];
-            this.partWeights[i] = other.partWeights[i];
-            this.releaseYears[i] = other.releaseYears[i];
-            this.partPrices[i] = other.partPrices[i];
+        for (int i = 0; i < componentsCount; i++) {
+            this.nameModel[i] = prototype.nameModel[i];
+            this.partWeights[i] = prototype.partWeights[i];
+            this.releaseYears[i] = prototype.releaseYears[i];
+            this.partPrices[i] = prototype.partPrices[i];
         }
 
-        createdCompsCount++;
-    }
-
-    public Comp(String filename) {
-        try (Scanner fileScanner = new Scanner(new File(filename))) {
-            if (fileScanner.hasNextLine()) this.ownerName = fileScanner.nextLine();
-            if (fileScanner.hasNextLine()) this.id = fileScanner.nextLine();
-            if (fileScanner.hasNextLine()) this.color = fileScanner.nextLine();
-            if (fileScanner.hasNextLine()) this.os = fileScanner.nextLine();
-            if (fileScanner.hasNextByte()) this.componentsCount = fileScanner.nextByte();
-            fileScanner.nextLine();
-
-            this.partNames = new String[this.componentsCount];
-            this.partWeights = new float[this.componentsCount];
-            this.releaseYears = new float[this.componentsCount];
-            this.partPrices = new double[this.componentsCount];
-
-            for (int i = 0; i < this.componentsCount; i++) {
-                if (fileScanner.hasNextLine()) this.partNames[i] = fileScanner.nextLine();
-                if (fileScanner.hasNextFloat()) this.partWeights[i] = fileScanner.nextFloat();
-                if (fileScanner.hasNextFloat()) this.releaseYears[i] = fileScanner.nextFloat();
-                if (fileScanner.hasNextDouble()) this.partPrices[i] = fileScanner.nextDouble();
-                if (fileScanner.hasNextLine()) fileScanner.nextLine();
-            }
-        } catch (FileNotFoundException e) {
-            System.err.println("Ошибка при чтении файла " + filename + ": " + e.getMessage());
-        }
+        // Необязательные поля копируем как есть, кроме уникального номера — у копии он свой
+        this.color = prototype.color;
+        this.power = prototype.power;
+        this.os = prototype.os;
+        this.uniqueNumber = nextUniqueNumber++;
 
         createdCompsCount++;
     }
 
-    public String getOwnerName() { return ownerName; }
-    public void setOwnerName(String ownerName) { this.ownerName = ownerName; }
+    // --- Методы set() и get() ---
+    public String getNickName() { return nickName; }
+    public void setNickName(String nickName) { this.nickName = nickName; }
 
     public byte getComponentsCount() { return componentsCount; }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public String[] getNameModel() { return nameModel; }
+    public void setNameModel(String[] nameModel) { this.nameModel = nameModel; }
+
+    public Float[] getPartWeights() { return partWeights; }
+    public void setPartWeights(Float[] partWeights) { this.partWeights = partWeights; }
+
+    public Float[] getReleaseYears() { return releaseYears; }
+    public void setReleaseYears(Float[] releaseYears) { this.releaseYears = releaseYears; }
+
+    public Double[] getPartPrices() { return partPrices; }
+    public void setPartPrices(Double[] partPrices) { this.partPrices = partPrices; }
+
+    public static int getCreatedCompsCount() { return createdCompsCount; }
+
+    // --- Геттеры/сеттеры для необязательных полей ---
+    public Integer getUniqueNumber() { return uniqueNumber; }
+    // Уникальный номер не переустанавливаем вручную, но метод оставлен на случай особых сценариев
+    public void setUniqueNumber(Integer uniqueNumber) { this.uniqueNumber = uniqueNumber; }
 
     public String getColor() { return color; }
     public void setColor(String color) { this.color = color; }
 
+    public Integer getPower() { return power; }
+    public void setPower(Integer power) { this.power = power; }
+
     public String getOs() { return os; }
     public void setOs(String os) { this.os = os; }
 
-    public static int getCreatedCompsCount() { return createdCompsCount; }
-
-    public String[] getPartNames() { return partNames.clone(); }
-    public float[] getPartWeights() { return partWeights.clone(); }
-    public float[] getReleaseYears() { return releaseYears.clone(); }
-    public double[] getPartPrices() { return partPrices.clone(); }
-
-    public void setPartsData(String[] names, float[] weights, float[] years, double[] prices) {
-        int len = Math.min(this.componentsCount, names.length);
-        for (int i = 0; i < len; i++) {
-            this.partNames[i] = names[i];
-            this.partWeights[i] = weights[i];
-            this.releaseYears[i] = years[i];
-            this.partPrices[i] = prices[i];
-        }
-    }
-
+    // Печать всей технической информации
     public void printInfo() {
         System.out.println("==============================================");
-        System.out.println("Владелец ПК:        " + ownerName);
-        System.out.println("ID:                 " + id);
-        System.out.println("Цвет:               " + color);
-        System.out.println("ОС:                 " + os);
+        System.out.println("Владелец ПК:        " + nickName);
+        System.out.println("Уникальный номер:   " + uniqueNumber);
+        if (color != null) System.out.println("Цвет:               " + color);
+        if (power != null) System.out.println("Мощность БП:        " + power + " Вт");
+        if (os != null) System.out.println("ОС:                 " + os);
         System.out.println("Количество деталей: " + componentsCount);
         System.out.println("--- Список деталей ---");
         for (int i = 0; i < componentsCount; i++) {
-            System.out.printf("  [%d] %-20s | Вес: %6.2f кг | Год: %.0f | Цена: %8.2f $\n",
-                    (i + 1), partNames[i], partWeights[i], releaseYears[i], partPrices[i]);
+            System.out.println("  [" + (i + 1) + "] " + nameModel[i] +
+                    " | Вес: " + partWeights[i] + " кг" +
+                    " | Год: " + releaseYears[i].intValue() +
+                    " | Цена: " + partPrices[i] + " ");
         }
-        System.out.printf("Общий вес: %.2f кг\n", getTotalWeight());
-        System.out.printf("Общая стоимость: %.2f $\n", getTotalPrice());
-        System.out.printf("Средний год выпуска деталей: %.1f\n", getAverageReleaseYear());
-        System.out.printf("Средний возраст деталей: %.1f лет\n", getAverageAge());
+        System.out.println("Общий вес: " + getTotalWeight() + " кг");
+        System.out.println("Общая стоимость: " + getTotalPrice() + " ");
+        System.out.println("Средний год выпуска: " + getAverageReleaseYear());
         System.out.println("==============================================");
     }
 
-    public void readFromKeyboard() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Введите имя владельца: ");
-        this.ownerName = scanner.nextLine();
-        System.out.print("Введите ID компьютера: ");
-        this.id = scanner.nextLine();
-        System.out.print("Введите цвет: ");
-        this.color = scanner.nextLine();
-        System.out.print("Введите установленную ОС: ");
-        this.os = scanner.nextLine();
-
-        System.out.print("Введите число деталей (1..127): ");
-        this.componentsCount = scanner.nextByte();
-        scanner.nextLine();
-
-        this.partNames = new String[this.componentsCount];
-        this.partWeights = new float[this.componentsCount];
-        this.releaseYears = new float[this.componentsCount];
-        this.partPrices = new double[this.componentsCount];
-
-        for (int i = 0; i < this.componentsCount; i++) {
-            System.out.println("--- Деталь " + (i + 1) + " ---");
-            System.out.print(" Название (модель/производитель): ");
-            this.partNames[i] = scanner.nextLine();
-            System.out.print(" Вес (кг): ");
-            this.partWeights[i] = scanner.nextFloat();
-            System.out.print(" Год выпуска: ");
-            this.releaseYears[i] = scanner.nextFloat();
-            System.out.print(" Стоимость ($): ");
-            this.partPrices[i] = scanner.nextDouble();
-            scanner.nextLine();
-        }
-    }
-
-    public void fillRandom() {
-        Random rand = new Random();
-        String[] owners = {"Алексей", "Дмитрий", "Елена", "Мария", "Сергей", "Иван"};
-        String[] colors = {"Черный", "Белый", "Серебристый", "Темно-серый"};
-        String[] osList = {"Windows 11", "Ubuntu 24.04", "macOS", "Arch Linux"};
-        String[] sampleParts = {"CPU Intel", "GPU NVIDIA", "RAM Kingston", "SSD Samsung", "Motherboard ASUS", "PSU Corsair"};
-
-        this.ownerName = owners[rand.nextInt(owners.length)];
-        this.id = "ID-" + (1000 + rand.nextInt(9000));
-        this.color = colors[rand.nextInt(colors.length)];
-        this.os = osList[rand.nextInt(osList.length)];
-
-        this.componentsCount = (byte) (3 + rand.nextInt(4));
-
-        this.partNames = new String[this.componentsCount];
-        this.partWeights = new float[this.componentsCount];
-        this.releaseYears = new float[this.componentsCount];
-        this.partPrices = new double[this.componentsCount];
-
-        for (int i = 0; i < this.componentsCount; i++) {
-            this.partNames[i] = sampleParts[rand.nextInt(sampleParts.length)] + " v" + (i + 1);
-            this.partWeights[i] = 0.2f + rand.nextFloat() * 2.5f;
-            this.releaseYears[i] = 2015 + rand.nextInt(11);
-            this.partPrices[i] = 50.0 + rand.nextDouble() * 450.0;
-        }
-    }
-
+    // Расчет общей стоимости
     public double getTotalPrice() {
         double total = 0;
         for (double price : partPrices) total += price;
         return total;
     }
 
+    // Расчет общего веса
     public float getTotalWeight() {
         float total = 0;
         for (float weight : partWeights) total += weight;
         return total;
     }
 
+    // Средний год выпуска
     public float getAverageReleaseYear() {
         if (componentsCount == 0) return 0;
         float sumYears = 0;
@@ -255,158 +163,226 @@ class Comp {
         return sumYears / componentsCount;
     }
 
-    public float getAverageAge() {
-        int currentYear = Year.now().getValue();
-        return currentYear - getAverageReleaseYear();
+
+    public static String inStreang() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            return reader.readLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void compareAndUpgradeRelevance(Comp other) {
-        float avgYearThis = this.getAverageReleaseYear();
-        float avgYearOther = other.getAverageReleaseYear();
+    public static String inString() {
+        return inStreang();
+    }
 
-        Comp oldest = null;
-        if (avgYearThis < avgYearOther) {
-            oldest = this;
-            System.out.println("\nКомпьютер владельца " + this.ownerName + " старше, чем компьютер " + other.ownerName);
-        } else if (avgYearOther < avgYearThis) {
-            oldest = other;
-            System.out.println("\nКомпьютер владельца " + other.ownerName + " старше, чем компьютер " + this.ownerName);
-        } else {
-            System.out.println("\nОба компьютера имеют одинаковую актуальность деталей.");
+    public static double inDouble() {
+        return Double.valueOf(inStreang());
+    }
+
+    public static float inFloat() {
+        return Float.parseFloat(inStreang());
+    }
+
+    public static byte inByte() {
+        return Byte.parseByte(inStreang());
+    }
+
+    public void readFromKeyboard() {
+        System.out.print("Введите имя компьютера (nickName): ");
+        this.nickName = inString();
+
+        System.out.print("Введите количество комплектующих: ");
+        this.componentsCount = inByte();
+
+        // Пересоздаём массивы под введённый размер
+        this.nameModel = new String[this.componentsCount];
+        this.partWeights = new Float[this.componentsCount];
+        this.releaseYears = new Float[this.componentsCount];
+        this.partPrices = new Double[this.componentsCount];
+
+        for (int i = 0; i < this.componentsCount; i++) {
+            System.out.println("\n--- Деталь #" + (i + 1) + " ---");
+
+            System.out.print("Название модели: ");
+            this.nameModel[i] = inString();
+
+            do {
+                System.out.print("Вес детали: ");
+                this.partWeights[i] = inFloat();
+            } while (partWeights[i] <= 0 || partWeights[i] > 5);
+
+            System.out.print("Год выпуска: ");
+            this.releaseYears[i] = inFloat();
+
+            System.out.print("Цена детали: ");
+            this.partPrices[i] = inDouble();
+        }
+
+        createdCompsCount++;
+    }
+
+
+    // Заполнение объекта случайными значениями
+    public void fillRandom() {
+        Random rand = new Random();
+        String[] names = {"Алексей", "Дмитрий", "Елена", "Мария", "Сергей", "Иван"};
+        String[] sampleParts = {"CPU Intel", "GPU NVIDIA", "RAM Kingston", "SSD Samsung", "Motherboard ASUS", "PSU Corsair"};
+
+        this.nickName = names[rand.nextInt(names.length)];
+        this.componentsCount = (byte) (3 + rand.nextInt(4));
+
+        this.nameModel = new String[this.componentsCount];
+        this.partWeights = new Float[this.componentsCount];
+        this.releaseYears = new Float[this.componentsCount];
+        this.partPrices = new Double[this.componentsCount];
+
+        for (int i = 0; i < this.componentsCount; i++) {
+            this.nameModel[i] = sampleParts[rand.nextInt(sampleParts.length)] + " v" + (i + 1);
+            this.partWeights[i] = 0.2f + rand.nextFloat() * 2.5f;
+            this.releaseYears[i] = 2015f + rand.nextFloat() * 11f;
+            this.partPrices[i] = 50.0 + rand.nextDouble() * 450.0;
+        }
+    }
+
+    // ==================================================================
+    // НОВОЕ: Добавление комплектующих ПК
+    // ==================================================================
+
+    /** Добавление новой детали в конец списка комплектующих. */
+    public void addComponent(String name, float weight, float year, double price) {
+        int oldCount = componentsCount;
+        int newCount = oldCount + 1;
+
+        String[] newNameModel = new String[newCount];
+        Float[] newPartWeights = new Float[newCount];
+        Float[] newReleaseYears = new Float[newCount];
+        Double[] newPartPrices = new Double[newCount];
+
+        for (int i = 0; i < oldCount; i++) {
+            newNameModel[i] = nameModel[i];
+            newPartWeights[i] = partWeights[i];
+            newReleaseYears[i] = releaseYears[i];
+            newPartPrices[i] = partPrices[i];
+        }
+
+        newNameModel[oldCount] = name;
+        newPartWeights[oldCount] = weight;
+        newReleaseYears[oldCount] = year;
+        newPartPrices[oldCount] = price;
+
+        nameModel = newNameModel;
+        partWeights = newPartWeights;
+        releaseYears = newReleaseYears;
+        partPrices = newPartPrices;
+        componentsCount = (byte) newCount;
+
+        System.out.println("Деталь \"" + name + "\" добавлена.");
+    }
+
+    // ==================================================================
+
+    // Сравнение 2-х компьютеров и апгрейд
+    public void compareAndUpgradeRelevance(PC other) {
+        float avg1 = this.getAverageReleaseYear();
+        float avg2 = other.getAverageReleaseYear();
+
+        if (avg1 == avg2) {
+            System.out.println("Компьютеры одинаковой актуальности.");
             return;
         }
 
-        System.out.println("\n--- СОСТОЯНИЕ УСТАРЕВШЕГО ПК ДО АПГРЕЙДА ---");
+        PC oldest = (avg1 < avg2) ? this : other;
+
+        System.out.println("\nДо апгрейда:");
         oldest.printInfo();
 
-        int currentYear = Year.now().getValue();
         for (int i = 0; i < oldest.componentsCount; i++) {
-            oldest.releaseYears[i] = currentYear;
-            oldest.partPrices[i] += 150.0;
+            oldest.releaseYears[i] = 2026f;
+            oldest.partPrices[i] += 100.0;
         }
-        oldest.setOs("Windows 11 Pro (Upgraded)");
 
-        System.out.println("\n--- СОСТОЯНИЕ УСТАРЕВШЕГО ПК ПОСЛЕ АПГРЕЙДА ---");
+        System.out.println("\nПосле апгрейда:");
         oldest.printInfo();
     }
 
-    public static void compareWeight(Comp c1, Comp c2) {
+    // Сравнение 2-х компьютеров по весу
+    public static void compareWeight(PC c1, PC c2) {
         float w1 = c1.getTotalWeight();
         float w2 = c2.getTotalWeight();
 
         System.out.println("\n=== Сравнение по весу ===");
-        System.out.printf("ПК (%s): %.2f кг | ПК (%s): %.2f кг\n", c1.getOwnerName(), w1, c2.getOwnerName(), w2);
+        System.out.printf("ПК (%s): %.2f кг | ПК (%s): %.2f кг\n", c1.getNickName(), w1, c2.getNickName(), w2);
 
         if (w1 > w2) {
-            System.out.printf("Компьютер %s тяжелее компьютера %s на %.2f кг.\n", c1.getOwnerName(), c2.getOwnerName(), (w1 - w2));
+            System.out.printf("Компьютер %s тяжелее компьютера %s на %.2f кг.\n", c1.getNickName(), c2.getNickName(), (w1 - w2));
         } else if (w2 > w1) {
-            System.out.printf("Компьютер %s тяжелее компьютера %s на %.2f кг.\n", c2.getOwnerName(), c1.getOwnerName(), (w2 - w1));
+            System.out.printf("Компьютер %s тяжелее компьютера %s на %.2f кг.\n", c2.getNickName(), c1.getNickName(), (w2 - w1));
         } else {
             System.out.println("Оба компьютера имеют одинаковый вес.");
         }
     }
 
+    // Сохранение в файл
     public void saveToFile(String filename) {
         try (PrintWriter writer = new PrintWriter(filename)) {
-            writer.println(ownerName);
-            writer.println(id);
-            writer.println(color);
-            writer.println(os);
+            writer.println(nickName);
             writer.println(componentsCount);
 
             for (int i = 0; i < componentsCount; i++) {
-                writer.println(partNames[i]);
+                writer.println(nameModel[i]);
                 writer.println(partWeights[i]);
                 writer.println(releaseYears[i]);
                 writer.println(partPrices[i]);
             }
             System.out.println("Данные объекта успешно сохранены в файл: " + filename);
         } catch (FileNotFoundException e) {
-            System.err.println("Ошибка сохранения в файл " + filename + ": " + e.getMessage());
+            System.err.println("Ошибка при сохранении в файл " + filename + ": " + e.getMessage());
         }
     }
-}
 
-// Публичный класс точки входа для файла Main.java
-public class Main {
     public static void main(String[] args) {
-        System.out.println("=== СОЗДАНИЕ ОТДЕЛЬНЫХ ЭКЗЕМПЛЯРОВ КЛАССА COMP ===");
+        PC c1 = new PC();
+        c1.fillRandom();
+        c1.printInfo();
 
-        Comp comp1 = new Comp();
-        comp1.fillRandom();
-        System.out.println("\n[Создан Comp1 via Default Construct]");
-        comp1.printInfo();
+        PC c2 = new PC("Иван", (byte) 2,
+                new String[]{"SSD", "RAM"}, new float[]{0.1f, 0.05f}, new float[]{2019f, 2021f}, new double[]{80.0, 60.0});
+        c2.printInfo();
 
-        String[] parts = {"Intel Core i7", "RTX 4060", "Kingston 32GB"};
-        float[] weights = {0.3f, 1.2f, 0.1f};
-        float[] years = {2022f, 2023f, 2021f};
-        double[] prices = {350.0, 500.0, 120.0};
+        // Пример использования метода добавления комплектующих
+        c2.addComponent("Кулер DeepCool", 0.6f, 2023f, 35.0);
+        c2.printInfo();
 
-        Comp comp2 = new Comp("Виктор", "ID-7701", "Белый", "Windows 11", (byte) 3, parts, weights, years, prices);
-        System.out.println("\n[Создан Comp2 via Params Construct]");
-        comp2.printInfo();
+        // Сеть компов
+        PC[] network = new PC[]{c1, c2, new PC(c2)};
 
-        Comp comp3 = new Comp(comp2);
-        comp3.setOwnerName("Копия Виктора (Анна)");
-        System.out.println("\n[Создан Comp3 via Copy Construct (из Comp2)]");
-        comp3.printInfo();
-
-        System.out.println("\n=== ФОРМИРОВАНИЕ И ИНИЦИАЛИЗАЦИЯ СЕТИ (ДИНАМИЧЕСКИЙ ВЕКТОР) ===");
-        List<Comp> network = new ArrayList<>();
-
-        Comp netComp1 = new Comp();
-        netComp1.fillRandom();
-
-        Comp netComp2 = new Comp("Ольга", "ID-2030", "Красный", "Linux Mint", (byte) 0);
-        netComp2.fillRandom();
-
-        Comp netComp3 = new Comp(comp2);
-        netComp3.setOwnerName("Сетевой ПК (Клон)");
-
-        network.add(netComp1);
-        network.add(netComp2);
-        network.add(netComp3);
-
-        System.out.println("\n=== ВЫВОД ВСЕХ КОМПЬЮТЕРОВ ИЗ СЕТИ ===");
-        for (int i = 0; i < network.size(); i++) {
-            System.out.println("Компьютер сети #" + (i + 1));
-            network.get(i).printInfo();
+        System.out.println("\n--- Информация о сети ---");
+        for (PC c : network) {
+            c.printInfo();
         }
 
-        System.out.println("\n=== СРАВНЕНИЕ ПО АКТУАЛЬНОСТИ И АПГРЕЙД ===");
-        comp2.compareAndUpgradeRelevance(comp1);
+        PC.compareWeight(c1, c2);
+        c1.compareAndUpgradeRelevance(c2);
 
-        Comp.compareWeight(comp1, comp2);
-
-        List<Comp> allCreatedComps = new ArrayList<>();
-        allCreatedComps.add(comp1);
-        allCreatedComps.add(comp2);
-        allCreatedComps.add(comp3);
-        allCreatedComps.addAll(network);
-
-        Comp mostExpensive = allCreatedComps.get(0);
-        for (Comp c : allCreatedComps) {
-            if (c.getTotalPrice() > mostExpensive.getTotalPrice()) {
-                mostExpensive = c;
+        // Поиск самого дорогого
+        PC expensive = network[0];
+        for (PC c : network) {
+            if (c.getTotalPrice() > expensive.getTotalPrice()) {
+                expensive = c;
             }
         }
+        System.out.println("\nСамый дорогой ПК принадлежит: " + expensive.getNickName() + " (" + expensive.getTotalPrice() + " )");
 
-        System.out.println("\n=== САМЫЙ ДОРОГОЙ КОМПЬЮТЕР ===");
-        System.out.println("Владелец: " + mostExpensive.getOwnerName());
-        System.out.printf("Общая стоимость: %.2f $\n", mostExpensive.getTotalPrice());
+        // Сохранение файла
+        c1.saveToFile("comp_ivan.txt");
 
-        System.out.println("\n=== СОХРАНЕНИЕ ОБЪЕКТОВ В ТЕКСТОВЫЕ ФАЙЛЫ (ОЦЕНКА 10) ===");
-        for (int i = 0; i < allCreatedComps.size(); i++) {
-            Comp c = allCreatedComps.get(i);
-            String fileName = "Comp_Obj_" + (i + 1) + "_" + c.getOwnerName().replaceAll("\\s+", "_") + ".txt";
-            c.saveToFile(fileName);
-        }
-
-        System.out.println("\n[Проверка] Загрузка объекта из созданного файла:");
-        String sampleFile = "Comp_Obj_2_" + comp2.getOwnerName().replaceAll("\\s+", "_") + ".txt";
-        Comp loadedComp = new Comp(sampleFile);
-        loadedComp.printInfo();
-
-        System.out.println("\nЧисло созданных компов (украшений): " + Comp.getCreatedCompsCount());
+        System.out.println("\nЧисло созданных компов: " + PC.getCreatedCompsCount());
+//
+//        PC c3 = new PC();
+//        c3.readFromKeyboard();
+//
+//        c3.saveToFile("comp_ivan.txt");
     }
 }
