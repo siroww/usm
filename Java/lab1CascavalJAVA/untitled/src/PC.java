@@ -1,5 +1,3 @@
-import com.sun.jdi.event.StepEvent;
-
 import java.io.*;
 import java.util.Random;
 //import java.util.Scanner;
@@ -278,7 +276,7 @@ public class PC {
         for (int i = 0; i < this.componentsCount; i++) {
             this.nameModel[i] = sampleParts[rand.nextInt(sampleParts.length)] + " v" + (i + 1);
             this.partWeights[i] = 0.2f + rand.nextFloat() * 2.5f;
-            this.releaseYears[i] = 2015f + rand.nextFloat() * 11f; // ИСПРАВЛЕНО: совместимо со всеми версиями Java
+            this.releaseYears[i] = 2015f + rand.nextFloat() * 11f;
             this.partPrices[i] = 50.0 + rand.nextDouble() * 450.0;
         }
     }
@@ -371,22 +369,34 @@ public class PC {
             c.printInfo();
         }
 
-        PC.compareWeight(c1, c2);
-        c1.compareAndUpgradeRelevance(c2);
-
-        // Поиск самого дорогого
-        PC expensive = network[0];
+        PC minComponents = network[0];
         for (PC c : network) {
-            if (c.getTotalPrice() > expensive.getTotalPrice()) {
-                expensive = c;
+            if (c.getComponentsCount() < minComponents.getComponentsCount()) {
+                minComponents = c;
             }
         }
-        System.out.println("\nСамый дорогой ПК принадлежит: " + expensive.getNickName() + " (" + expensive.getTotalPrice() + " $)");
+        System.out.println("\nPC с найменьшим кол компонентов: " + minComponents.componentsCount );
 
-        // Сохранение файла
-        c1.saveToFile("comp.txt");
 
-        System.out.println("\nЧисло созданных компов: " + PC.getCreatedCompsCount());
+
+
+
+//        PC.compareWeight(c1, c2);
+//        c1.compareAndUpgradeRelevance(c2);
+//
+//        // Поиск самого дорогого
+//        PC expensive = network[0];
+//        for (PC c : network) {
+//            if (c.getTotalPrice() > expensive.getTotalPrice()) {
+//                expensive = c;
+//            }
+//        }
+//        System.out.println("\nСамый дорогой ПК принадлежит: " + expensive.getNickName() + " (" + expensive.getTotalPrice() + " $)");
+//
+//        // Сохранение файла
+//        c1.saveToFile("comp.txt");
+//
+//        System.out.println("\nЧисло созданных компов: " + PC.getCreatedCompsCount());
 //
 //        PC c4 = new PC();
 //        c4.readFromKeyboard();
