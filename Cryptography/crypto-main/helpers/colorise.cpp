@@ -7,32 +7,31 @@
 #include "../include/utils.hpp"
 #include <cstdarg>
 
-// хэш-таблица для хранения цветовых кодов ANSI
+// Теги цветов больше не используются: вывод остаётся без ANSI-кодов
 inline const std::unordered_map<std::string, std::string>& getColors() {
     static const std::unordered_map<std::string, std::string> COLORS = {
-        {"<red>", "\033[31m"},
-        {"<green>", "\033[32m"},
-        {"<yellow>", "\033[33m"},
-        {"<blue>", "\033[34m"},
-        {"<magenta>", "\033[35m"},
-        {"<cyan>", "\033[36m"},
-        {"<white>", "\033[37m"},
-        {"<reset>", "\033[0m"},
-        {"<enc>", "\033[33m Encrypt: \033[0m"},
-        {"<dec>", "\033[33m Decrypt: \033[0m"},
-        {"<key>", "\033[33m Key: \033[0m"}
+        {"<red>", ""},
+        {"<green>", ""},
+        {"<yellow>", ""},
+        {"<blue>", ""},
+        {"<magenta>", ""},
+        {"<cyan>", ""},
+        {"<white>", ""},
+        {"<reset>", ""},
+        {"<enc>", "Encrypt: "},
+        {"<dec>", "Decrypt: "},
+        {"<key>", "Key: "}
     };
     return COLORS;
 }
 
 void color(const std::string& colorCode) {
-    std::cout << colorCode;
+    (void)colorCode;
 }
 
 void resetColor() {
-    std::cout << "\033[0m" << std::endl;
+    std::cout << std::endl;
 }
-
 
 std::string echo(const std::string& message) {
     std::string result = "";
@@ -50,7 +49,6 @@ std::string echo(const std::string& message) {
             result += " ";
         }
     }
-    result += "\033[0m";
     return result;
 }
 

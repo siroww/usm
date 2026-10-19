@@ -1,0 +1,91 @@
+-- 1. WHERE, ORDER BY, ALIAS, арифметика (повышение зарплаты на 15%) и строка (CONCAT)
+SELECT 
+    CONCAT(name, ' ', surname) AS full_name, 
+    salary AS current_salary,
+    (salary * 1.15) AS projected_salary -- арифметика
+FROM employees
+WHERE salary > 50000
+ORDER BY salary DESC;
+
+-- 2. Строковые функции (UPPER, LENGTH, SUBSTRING) и WHERE, ORDER BY, ALIAS
+SELECT 
+    UPPER(name) AS upper_name,
+    LENGTH(email) as email_length,
+    SUBSTRING(email, 1, 3) AS email_prefix
+FROM employees
+WHERE department_id = 1
+ORDER BY email_length ASC;
+
+-- 3. Функции даты (CURRENT_DATE, EXTRACT / YEAR, AGE или арифметические операции с датами)
+SELECT 
+    name,
+    hire_date,
+    EXTRACT(YEAR FROM hire_date) AS hire_year,
+    CURRENT_DATE - hire_date AS days_in_company -- арифметика с датами
+FROM employees
+WHERE hire_date >= '2020-01-01'
+ORDER BY hire_date ASC;
+
+-- 4. Работа с датами (проверка стажа через интервалы / разницу лет) и ALIAS, WHERE
+SELECT 
+    surname,
+    hire_date
+FROM employees
+WHERE hire_date < CURRENT_DATE - INTERVAL '5 years'
+ORDER BY surname;
+
+-- 5. Арифметика с бюджетами проектов (остаток бюджета после условных расходов) и ALIAS, WHERE, ORDER BY
+SELECT 
+    title,
+    budget,
+    (budget * 0.8) AS allocated_budget,
+    (budget - (budget * 0.8)) AS reserve_fund
+FROM projects
+WHERE budget > 100000
+ORDER BY reserve_fund DESC;
+
+-- 6. Агрегатная функция COUNT и SUM с GROUP BY
+SELECT 
+    department_id,
+    COUNT(id) AS total_employees,
+    SUM(salary) AS total_payroll
+FROM employees
+GROUP BY department_id;
+
+-- 7. Агрегатные функции AVG, MIN, MAX с GROUP BY и HAVING
+SELECT 
+    department_id,
+    ROUND(AVG(salary), 2) AS average_salary,
+    MIN(salary) AS min_salary,
+    MAX(salary) AS max_salary
+FROM employees
+GROUP BY department_id
+HAVING AVG(salary) > 60000;
+
+-- 8. Использование COUNT и HAVING для фильтрации групп
+SELECT 
+    project_id,
+    COUNT(employee_id) AS team_size
+FROM employee_projects
+GROUP BY project_id
+HAVING COUNT(employee_id) >= 3;
+
+-- 9. Комбинированный запрос (WHERE, SUM, GROUP BY, ORDER BY, ALIAS)
+SELECT 
+    department_id,
+    SUM(salary) AS sum_salary
+FROM employees
+WHERE hire_date > '2019-01-01'
+GROUP BY department_id
+ORDER BY sum_salary DESC;
+
+-- 10. Комплексный отчет с MIN, MAX, COUNT и условиями WHERE / HAVING
+SELECT 
+    department_id,
+    COUNT(*) as dept_count,
+    MAX(hire_date) as latest_hire
+FROM employees
+WHERE salary < 100000
+GROUP BY department_id
+HAVING COUNT(*) > 1
+ORDER BY dept_count DESC;

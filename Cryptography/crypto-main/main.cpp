@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "include/globals.h"
 #include "include/file.h"
@@ -16,42 +17,40 @@ int main(int argc, char *argv[]) {
     if (argc < 2) {
 
         std::cout << echo(
-            "* <magenta> Copyright (C) 2026 Dmitrii Zimnov (Ywxig) <reset> \n"
+            "* Copyright (C) 2026 Кашкавал Степан\n"
             "*\n"
-            "* This program is free software: you can redistribute it and/or modify\n"
-            "* it under the terms of the GNU General Public License as published by\n"
-            "* the Free Software Foundation, either version 3 of the License, or\n"
-            "* (at your option) any later version.\n"
+            "* Эта программа распространяется свободно: вы можете использовать,\n"
+            "* изменять и распространять её в соответствии с условиями GNU GPL.\n"
             "*\n"
-            "* This program is distributed in the hope that it will be useful,\n"
-            "* but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-            "* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-            "* GNU General Public License for more details.\n"
+            "* Программа предоставляется как есть, без гарантий,\n"
+            "* включая их коммерческую пригодность и пригодность для конкретной цели.\n"
             "*\n"
-            "* You should have received a copy of the GNU General Public License\n"
-            "* along with this program.  If not, see <https://www.gnu.org/licenses/>.\n"
+            "* Вы должны были получить копию GNU General Public License\n"
+            "* вместе с этой программой. Если нет, см. <https://www.gnu.org/licenses/>.\n"
             "\n"
             "\n"
             "\n"
-            "Usage: <green> " + std::string(argv[0]) + " <magenta> <option> <reset> <message>\n"
-             "Options:\n"
-             " <yellow> -Ecsr <reset> Encrypt (Caesar Shift)\n"
-             " <yellow> -Dcsr <reset> Decrypt (Caesar Shift)\n"
-             " <yellow> -Ecsk <reset> Encrypt (Caesar Keyword)\n"
-             " <yellow> -Dcsk <reset> Decrypt (Caesar Keyword)\n"
-             " <yellow> -Evgn <reset> Encrypt (Vigenere)\n"
-             " <yellow> -Dvgn <reset> Decrypt (Vigenere)\n"
-             " <yellow> -GFm <reset> GF(2) multiplication\n"
-             " <yellow> -PEG <reset> Polynomial Extended GCD\n"
-             " <yellow> -Tlog <reset> GF(2) multiplication table\n"
-             " <yellow> -F <reset> Read file\n"
-             " <yellow> -I <reset> Interactive mode\n"
-             " <yellow> -v <reset> Version info\n");
+            "Использование: " + std::string(argv[0]) + " <опция> <сообщение>\n"
+             "Опции:\n"
+             " -encrypt  Шифрование (Caesar Shift)\n"
+             " -Ecsr     Шифрование (Caesar Shift, alias)\n"
+             " -Dcsr  Расшифрование (Caesar Shift)\n"
+             " -Ecsk  Шифрование (Caesar Keyword)\n"
+             " -Dcsk  Расшифрование (Caesar Keyword)\n"
+             " -Evgn  Шифрование (Vigenere)\n"
+             " -Dvgn  Расшифрование (Vigenere)\n"
+             " -GFm   Умножение в GF(2)\n"
+             " -PEG   Полиномиальный расширенный алгоритм Евклида\n"
+             " -Tlog  Таблица умножения GF(2)\n"
+             " -F     Чтение файла\n"
+             " -I     Интерактивный режим\n"
+             " -v     Версия\n");
         exit(1);
     }
 
     std::string opt = argv[1];
     std::string msg_str = "";
+    std::vector<char> msg_buffer;
     char *msg = nullptr;
     std::string alg = "";
     std::string file = "";
@@ -61,7 +60,7 @@ int main(int argc, char *argv[]) {
         if (argc > 2) {
             alg = argv[2];
         } else {
-            std::cerr << echo("<red> " + (std::string)argv[0] + ": missing algorithm argument for -I\n");
+            std::cerr << echo((std::string)argv[0] + ": missing algorithm argument for -I\n");
             exit(2);
         }
     }
@@ -74,7 +73,7 @@ int main(int argc, char *argv[]) {
             alg = argv[2];
             file = argv[3];
         } else {
-            std::cerr << echo("<red> " + (std::string)argv[0] + ": missing algorithm or file argument for -F\n");
+            std::cerr << echo((std::string)argv[0] + ": missing algorithm or file argument for -F\n");
             exit(2);
         }
     }
@@ -86,19 +85,21 @@ int main(int argc, char *argv[]) {
         }
         if (argc < 3) {
             if (opt[0] == '-') {
-                std::cerr << echo("<red> " + (std::string)argv[0] + ": missing message argument\n");
+                std::cerr << echo((std::string)argv[0] + ": missing message argument\n");
                 exit(2);
             } else {
-                std::cerr << echo("<red> " + (std::string)argv[0] + ": missing option argument\n");
+                std::cerr << echo((std::string)argv[0] + ": missing option argument\n");
                 exit(2);
             }
         }
         msg_str = argv[2];
-        msg = msg_str.data();
+        msg_buffer.assign(msg_str.begin(), msg_str.end());
+        msg_buffer.push_back('\0');
+        msg = msg_buffer.data();
     }
 
 
-    if (opt == "-Ecsr") {
+    if (opt == "-encrypt" || opt == "-Ecsr") {
         CSR_encrypt(msg);
     } else if (opt == "-Dcsr") {
         CSR_decrypt(msg);
@@ -117,43 +118,65 @@ int main(int argc, char *argv[]) {
     } else if (opt == "-Evgns") {
         VGN_enc_seed(msg);
     } else if (opt == "-GFm") {
-        gf_mult(argv[2][0], argv[3][0]);
+        if (argc < 4) {
+            std::cerr << echo((std::string)argv[0] + ": missing arguments for -GFm\n");
+            exit(2);
+        }
+        uint8_t a = static_cast<uint8_t>(std::stoi(argv[2]));
+        uint8_t b = static_cast<uint8_t>(std::stoi(argv[3]));
+        std::cout << static_cast<int>(gf_mult(a, b)) << '\n';
         exit(0);
     } else if (opt == "-PEG") {
-        poly_ext_gcd(argv[2][0], 0x11B);
-        std::cout << argv[2][0] << " " << std::endl;
+        if (argc < 3) {
+            std::cerr << echo((std::string)argv[0] + ": missing argument for -PEG\n");
+            exit(2);
+        }
+        uint16_t value = static_cast<uint16_t>(std::stoi(argv[2]));
+        uint8_t* res = poly_ext_gcd(value, 0x11B);
+        std::cout << "gcd=" << static_cast<int>(res[0])
+                  << " inverse=" << static_cast<int>(res[1]) << '\n';
         exit(0);
     } else if (opt == "-Tlog") {
-        gf_mult_table(argv[2][0], argv[3][0]);
+        if (argc < 4) {
+            std::cerr << echo((std::string)argv[0] + ": missing arguments for -Tlog\n");
+            exit(2);
+        }
+        uint8_t a = static_cast<uint8_t>(std::stoi(argv[2]));
+        uint8_t b = static_cast<uint8_t>(std::stoi(argv[3]));
+        std::cout << static_cast<int>(gf_mult_table(a, b)) << '\n';
         exit(0);
     } else if (opt == "-I") {
         if (alg == "Idh") {
             DIFFI_HELLMAN();
         } else {
-            std::cerr << echo("<red> " + (std::string)argv[0] + ": unknown interactive algorithm '" + alg + "'\n");
+            std::cerr << echo((std::string)argv[0] + ": unknown interactive algorithm '" + alg + "'\n");
             exit(3);
         }
     } else if (opt == "-F") {
 
+        std::string file_content = fileRead(file);
+        std::vector<char> file_buffer(file_content.begin(), file_content.end());
+        file_buffer.push_back('\0');
+
         if (alg == "Ecsr") {
-            CSR_encrypt(fileRead(file).data());
+            CSR_encrypt(file_buffer.data());
         } else if (alg == "Dcsr") {
-            CSR_decrypt(fileRead(file).data());
+            CSR_decrypt(file_buffer.data());
         } else if (alg == "Ecsk") {
-            encrypt_caesar_keyword(fileRead(file).data());
+            encrypt_caesar_keyword(file_buffer.data());
         } else if (alg == "Dcsk") {
-            decrypt_caesar_keyword(fileRead(file).data());
+            decrypt_caesar_keyword(file_buffer.data());
         } else if (alg == "Evgn") {
-            VGN_encript(fileRead(file).data());
+            VGN_encript(file_buffer.data());
         } else if (alg == "Dvgn") {
-            VGN_decript(fileRead(file).data());
+            VGN_decript(file_buffer.data());
         } else {
-            std::cerr << echo("<red> " + (std::string)argv[0] + ": unknown algorithm '" + alg + "'\n");
+            std::cerr << echo((std::string)argv[0] + ": unknown algorithm '" + alg + "'\n");
             exit(3);
         }
 
     } else {
-        std::cerr << echo("<red> " + (std::string)argv[0] + ": unknown option '" + opt + "'\n");
+        std::cerr << echo((std::string)argv[0] + ": unknown option '" + opt + "'\n");
         exit(3);
     }
 
