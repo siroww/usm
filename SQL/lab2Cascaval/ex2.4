@@ -1,1 +1,23 @@
-1
+-- View 1: Полная информация об успеваемости учеников
+CREATE VIEW v_student_grades AS
+SELECT 
+    s.first_name || ' ' || s.last_name AS student_full_name,
+    sub.subject_name,
+    g.grade,
+    g.grade_date
+FROM grades g
+JOIN students s ON g.student_id = s.student_id
+JOIN subjects sub ON g.subject_id = sub.subject_id;
+
+-- View 2: Расписание занятий с читаемыми названиями классов, предметов и кабинетов
+CREATE VIEW v_full_schedule AS
+SELECT 
+    sch.day_of_week,
+    sch.lesson_number,
+    c.grade_level || c.letter AS class_name,
+    sub.subject_name,
+    cl.room_number
+FROM schedules sch
+JOIN classes c ON sch.class_id = c.class_id
+JOIN subjects sub ON sch.subject_id = sub.subject_id
+JOIN classrooms cl ON sch.classroom_id = cl.classroom_id;

@@ -1,0 +1,14 @@
+-- UNION: Все фамилии учителей и учеников в одном списке
+SELECT last_name FROM teachers
+UNION
+SELECT last_name FROM students;
+
+-- INTERSECT: Пример пересечения (например, имена, которые есть и у учителей, и у учеников)
+SELECT first_name FROM teachers
+INTERSECT
+SELECT first_name FROM students;
+
+-- EXCEPT: Имена учителей, которых нет среди имен учеников
+SELECT first_name FROM teachers
+EXCEPT
+SELECT first_name FROM students;

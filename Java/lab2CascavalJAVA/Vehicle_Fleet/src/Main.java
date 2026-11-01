@@ -10,8 +10,8 @@ public class Main {
         System.out.println("Компания: " + FleetConfig.COMPANY_NAME + "\n");
 
         // Пункт 13: Создать вектора объектов с типами: базовый класс && интерфейс
-        ArrayList<Vehicle> vehicles = new ArrayList<>();
-        ArrayList<Electric> electricVehicles = new ArrayList<>();
+        ArrayList<A_Vehicle> vehicles = new ArrayList<>();
+        ArrayList<I_Electric> electricVehicles = new ArrayList<>();
 
         // Заполняем вектор объектов разных наследников (вызываются конструкторы без параметров с рандомом)
         vehicles.add(new PassengerCar("Toyota Camry", 2022, 45000.0, 5, "Автомат"));
@@ -22,19 +22,23 @@ public class Main {
         // Добавляем еще один объект через дефолтный конструктор (проверка рандомизатора)
         vehicles.add(new ElectricCar());
 
-        // Заполняем вектор интерфейса Electric
-        for (Vehicle v : vehicles) {
-            if (v instanceof Electric) {
-                electricVehicles.add((Electric) v);
+        A_Vehicle mySuuperCar = new Truck();
+        ((Truck)mySuuperCar).dumpCargo();
+
+
+        // Заполняем вектор интерфейса I_Electric
+        for (A_Vehicle v : vehicles) {
+            if (v instanceof I_Electric) {
+                electricVehicles.add((I_Electric) v);
             }
         }
 
         // Вывод статистики парковки (Пункт 11)
-        Vehicle.printFleetStatistics();
+        A_Vehicle.printFleetStatistics();
 
         // Пункт 14: В функции main для созданных объектов вызвать уникальные функции, полиморфизм
         System.out.println("=== ДЕМОНСТРАЦИЯ ПОЛИМОРФИЗМА И УНИКАЛЬНЫХ ФУНКЦИЙ ===");
-        for (Vehicle v : vehicles) {
+        for (A_Vehicle v : vehicles) {
             v.displayGeneralInfo(); // функция родителя (Пункт 6)
             v.startEngine();        // полиморфный вызов абстрактной функции
 
@@ -57,9 +61,9 @@ public class Main {
             System.out.println("--------------------------------------------------");
         }
 
-        // Демонстрация работы с интерфейсом Electric
+        // Демонстрация работы с интерфейсом I_Electric
         System.out.println("\n=== ОБЪЕКТЫ ИНТЕРФЕЙСА ELECTRIC ===");
-        for (Electric el : electricVehicles) {
+        for (I_Electric el : electricVehicles) {
             el.chargeBattery();
             System.out.println("Текущий заряд батареи: " + el.getBatteryLevel() + "%");
         }
@@ -67,7 +71,7 @@ public class Main {
         // Пункт 9: Запись объектов в файл
         try (PrintWriter writer = new PrintWriter(new FileWriter("fleet_report.txt"))) {
             writer.println("=== ОТЧЕТ АВТОПАРКА ===");
-            for (Vehicle v : vehicles) {
+            for (A_Vehicle v : vehicles) {
                 v.writeToFile(writer); // полиморфный вызов записи в файл
             }
             System.out.println("\n[INFO] Данные успешно записаны в файл 'fleet_report.txt'.");

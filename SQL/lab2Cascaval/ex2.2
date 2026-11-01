@@ -1,0 +1,17 @@
+-- Subquery в WHERE: Ученики, у которых оценка выше среднего по всей школе
+SELECT first_name, last_name
+FROM students
+WHERE student_id IN (
+    SELECT student_id 
+    FROM grades 
+    WHERE grade > (SELECT AVG(grade) FROM grades)
+);
+
+-- Subquery в FROM: Средний балл по предметам через подзапроса-таблицу
+SELECT sub.subject_id, sub.avg_g
+FROM (
+    SELECT subject_id, AVG(grade) AS avg_g
+    FROM grades
+    GROUP BY subject_id
+) AS sub
+WHERE sub.avg_g > 7;

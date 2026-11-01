@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 
-$dir = 'image/';
-$files = scandir($dir);
+$imageDirectory = __DIR__ . '/image';
+$files = scandir($imageDirectory);
+
+if ($files === false) {
+    throw new RuntimeException('Unable to read the image directory: ' . $imageDirectory);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -72,24 +76,22 @@ $files = scandir($dir);
 
         <div class="gallery">
             <?php
-            if ($files !== false) {
-                for ($i = 0; $i < count($files); $i++) {
-                    if ($files[$i] !== "." && $files[$i] !== "..") {
-                        $path = $dir . $files[$i];
-                        // Проверяем расширение файла (.jpg или .jpeg)
-                        if (preg_match('/\.(jpg|jpeg|png|gif)$/i', $files[$i])) {
-                            echo '<img src="' . htmlspecialchars($path) . '" alt="Cat Image">';
-                        }
-                    }
+            $counter = 1;
+
+            foreach ($files as $file) {
+                if (!preg_match('/\.(jpg|jpeg|png|gif)$/i', $file)) {
+                    continue;
                 }
+
+                $imagePath = 'image/' . rawurlencode($file);
+                echo '<img src="' . htmlspecialchars($imagePath, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
+                    . '" alt="Фото номер ' . $counter . '">';
+                $counter++;
             }
             ?>
         </div>
     </main>
 
-    <footer>
-        USM © <?= date('Y') ?>
-    </footer>
 
 </body>
 </html>

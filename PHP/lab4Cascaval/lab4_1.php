@@ -93,10 +93,12 @@ function findTransactionByIdForeach(int $id): ?array
 function findTransactionById(int $id): ?array
 {
     global $transactions;
+
     $result = array_filter($transactions, function (array $transaction) use ($id): bool {
         return $transaction['id'] === $id;
     });
 
+    // Возвращаем первый элемент отфильтрованного массива или null, если он пуст
     return !empty($result) ? reset($result) : null;
 }
 
@@ -149,49 +151,167 @@ usort($transactions, function (array $a, array $b): int {
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Система управления банковскими транзакциями</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        table { border-collapse: collapse; width: 100%; margin-top: 15px; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
-        th { background-color: #f4f4f4; }
-        tfoot tr { font-weight: bold; background-color: #e9e9e9; }
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 24px;
+            color: #0f172a;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            max-width: 350px;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        tfoot tr {
+            font-weight: bold;
+            background-color: #f1f5f9;
+        }
+
+        .amount {
+            font-weight: 600;
+            color: #059669;
+        }
     </style>
 </head>
 <body>
 
-    <h2>Список транзакций</h2>
+    <div class="container">
+        <h2>Список транзакций</h2>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Дата</th>
-                <th>Сумма ($)</th>
-                <th>Описание</th>
-                <th>Организация (Merchant)</th>
-                <th>Дней с момента транзакции</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($transactions as $transaction): ?>
-                <tr>
-                    <td><?= htmlspecialchars((string)$transaction['id']) ?></td>
-                    <td><?= htmlspecialchars($transaction['date']) ?></td>
-                    <td><?= number_format($transaction['amount'], 2) ?></td>
-                    <td><?= htmlspecialchars($transaction['description']) ?></td>
-                    <td><?= htmlspecialchars($transaction['merchant']) ?></td>
-                    <td><?= daysSinceTransaction($transaction['date']) ?></td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="2">Итоговая сумма:</td>
-                <td colspan="4"><?= number_format(calculateTotalAmount($transactions), 2) ?> $</td>
-            </tr>
-        </tfoot>
-    </table>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Быстрый поиск по транзакциям..." onkeyup="filterTable()">
+        </div>
+
+        <div class="table-responsive">
+            <table id="transactionsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Дата</th>
+                        <th>Сумма ($)</th>
+                        <th>Описание</th>
+                        <th>Организация (Merchant)</th>
+                        <th>Дней с момента транзакции</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($transactions as $transaction): ?>
+                        <tr>
+                            <td><?= htmlspecialchars((string)$transaction['id']) ?></td>
+                            <td><?= htmlspecialchars($transaction['date']) ?></td>
+                            <td class="amount"><?= number_format($transaction['amount'], 2) ?></td>
+                            <td><?= htmlspecialchars($transaction['description']) ?></td>
+                            <td><?= htmlspecialchars($transaction['merchant']) ?></td>
+                            <td><?= daysSinceTransaction($transaction['date']) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2">Итоговая сумма:</td>
+                        <td colspan="4" class="amount"><?= number_format(calculateTotalAmount($transactions), 2) ?> $</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function filterTable() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById("transactionsTable");
+            const trs = table.getElementsByTagName("tr");
+
+            for (let i = 1; i < trs.length - 1; i++) { // Пропускаем заголовок и футер
+                let visible = false;
+                const tds = trs[i].getElementsByTagName("td");
+                for (let j = 0; j < tds.length; j++) {
+                    if (tds[j]) {
+                        if (tds[j].innerHTML.toLowerCase().indexOf(filter) > -1) {
+                            visible = true;
+                            break;
+                        }
+                    }
+                }
+                trs[i].style.display = visible ? "" : "none";
+            }
+        }
+    </script>
 
 </body>
 </html>

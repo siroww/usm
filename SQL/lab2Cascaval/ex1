@@ -1,91 +1,88 @@
--- 1. WHERE, ORDER BY, ALIAS, арифметика (повышение зарплаты на 15%) и строка (CONCAT)
+-- 1. Строковые функции (UPPER, CONCAT, SUBSTRING) + WHERE + ORDER BY + Alias
 SELECT 
-    CONCAT(name, ' ', surname) AS full_name, 
-    salary AS current_salary,
-    (salary * 1.15) AS projected_salary -- арифметика
-FROM employees
-WHERE salary > 50000
-ORDER BY salary DESC;
-
--- 2. Строковые функции (UPPER, LENGTH, SUBSTRING) и WHERE, ORDER BY, ALIAS
-SELECT 
-    UPPER(name) AS upper_name,
-    LENGTH(email) as email_length,
+    UPPER(last_name) AS upper_last_name, 
+    CONCAT(first_name, ' ', last_name) AS full_name,
     SUBSTRING(email, 1, 3) AS email_prefix
-FROM employees
-WHERE department_id = 1
-ORDER BY email_length ASC;
+FROM teachers
+WHERE teacher_id > 1
+ORDER BY last_name ASC;
 
--- 3. Функции даты (CURRENT_DATE, EXTRACT / YEAR, AGE или арифметические операции с датами)
+-- 2. Функции дат (CURRENT_DATE, EXTRACT) + Арифметика (возраст учеников) + WHERE
 SELECT 
-    name,
-    hire_date,
-    EXTRACT(YEAR FROM hire_date) AS hire_year,
-    CURRENT_DATE - hire_date AS days_in_company -- арифметика с датами
-FROM employees
-WHERE hire_date >= '2020-01-01'
-ORDER BY hire_date ASC;
+    first_name, 
+    last_name, 
+    birth_date,
+    EXTRACT(YEAR FROM AGE(CURRENT_DATE, birth_date)) AS age_years,
+    EXTRACT(YEAR FROM birth_date) + 18 AS adult_year -- Арифметика с датой
+FROM students
+WHERE birth_date >= '2008-01-01'
+ORDER BY birth_date DESC;
 
--- 4. Работа с датами (проверка стажа через интервалы / разницу лет) и ALIAS, WHERE
+-- 3. Арифметика (умножение вместимости кабинета на коэффициент) + Alias + WHERE
 SELECT 
-    surname,
-    hire_date
-FROM employees
-WHERE hire_date < CURRENT_DATE - INTERVAL '5 years'
-ORDER BY surname;
+    room_number,
+    max_seats,
+    max_seats * 2 AS double_capacity_estimation
+FROM classrooms
+WHERE max_seats >= 25
+ORDER BY max_seats DESC;
 
--- 5. Арифметика с бюджетами проектов (остаток бюджета после условных расходов) и ALIAS, WHERE, ORDER BY
+-- 4. Работа с датами (форматирование/сравнение) + WHERE + Alias
 SELECT 
-    title,
-    budget,
-    (budget * 0.8) AS allocated_budget,
-    (budget - (budget * 0.8)) AS reserve_fund
-FROM projects
-WHERE budget > 100000
-ORDER BY reserve_fund DESC;
+    student_id, 
+    grade, 
+    grade_date,
+    grade_date + INTERVAL '7 days' as retake_deadline -- Арифметика с датами (PostgreSQL)
+FROM grades
+WHERE grade_date >= '2026-09-01'
+ORDER BY grade_date;
 
--- 6. Агрегатная функция COUNT и SUM с GROUP BY
+-- 5. Строковые функции (LOWER, LENGTH) + WHERE + Alias
 SELECT 
-    department_id,
-    COUNT(id) AS total_employees,
-    SUM(salary) AS total_payroll
-FROM employees
-GROUP BY department_id;
+    subject_name,
+    LOWER(subject_name) AS lower_subject,
+    LENGTH(subject_name) AS name_length
+FROM subjects
+WHERE LENGTH(subject_name) > 6;
 
--- 7. Агрегатные функции AVG, MIN, MAX с GROUP BY и HAVING
-SELECT 
-    department_id,
-    ROUND(AVG(salary), 2) AS average_salary,
-    MIN(salary) AS min_salary,
-    MAX(salary) AS max_salary
-FROM employees
-GROUP BY department_id
-HAVING AVG(salary) > 60000;
+-- АГРЕГАТНЫЕ ФУНКЦИИ (COUNT, SUM, AVG, MIN, MAX) с GROUP BY и HAVING
 
--- 8. Использование COUNT и HAVING для фильтрации групп
+-- 6. COUNT: Количество учеников в каждом классе
 SELECT 
-    project_id,
-    COUNT(employee_id) AS team_size
-FROM employee_projects
-GROUP BY project_id
-HAVING COUNT(employee_id) >= 3;
+    class_id,
+    COUNT(student_id) AS total_students
+FROM students
+GROUP BY class_id
+HAVING COUNT(student_id) >= 1;
 
--- 9. Комбинированный запрос (WHERE, SUM, GROUP BY, ORDER BY, ALIAS)
+-- 7. AVG: Средняя оценка по каждому предмету
 SELECT 
-    department_id,
-    SUM(salary) AS sum_salary
-FROM employees
-WHERE hire_date > '2019-01-01'
-GROUP BY department_id
-ORDER BY sum_salary DESC;
+    subject_id,
+    ROUND(AVG(grade), 2) AS average_grade
+FROM grades
+GROUP BY subject_id
+HAVING AVG(grade) >= 8;
 
--- 10. Комплексный отчет с MIN, MAX, COUNT и условиями WHERE / HAVING
+-- 8. MAX: Максимальная оценка ученика
 SELECT 
-    department_id,
-    COUNT(*) as dept_count,
-    MAX(hire_date) as latest_hire
-FROM employees
-WHERE salary < 100000
-GROUP BY department_id
-HAVING COUNT(*) > 1
-ORDER BY dept_count DESC;
+    student_id,
+    MAX(grade) AS max_grade
+FROM grades
+GROUP BY student_id
+HAVING MAX(grade) >= 9;
+
+-- 9. MIN: Минимальная оценка по предметам
+SELECT 
+    subject_id,
+    MIN(grade) AS min_grade
+FROM grades
+GROUP BY subject_id
+HAVING MIN(grade) <= 8;
+
+-- 10. SUM: Общая сумма «баллов/оценок» по предметам (для примера использования SUM)
+SELECT 
+    subject_id,
+    SUM(grade) AS sum_grades
+FROM grades
+GROUP BY subject_id
+HAVING SUM(grade) > 5;

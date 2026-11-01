@@ -1,0 +1,466 @@
+A_Vehicle.java
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Random;
+import java.util.Scanner;
+
+public abstract class A_Vehicle {
+    // Пункт 11: Static переменные и функции
+    public static int totalVehiclesOnParking = 0; // сколько заехало на парковку
+    public static double totalFleetMileage = 0.0; // общий пробег автопарка
+
+    protected String brand;
+    protected int year;
+    protected double mileage;
+
+    // Пункт 5: Конструктор без параметров
+    public A_Vehicle() {
+        this.brand = "Unknown";
+        this.year = 2020;
+        this.mileage = 0.0;
+        totalVehiclesOnParking++;
+        randomize(); // Пункт 7: Переопределить/вызвать Randomize в дефолтном конструкторе
+    }
+
+    // Пункт 5: Конструктор с параметрами
+    public A_Vehicle(String brand, int year, double mileage) {
+        this.brand = brand;
+        this.year = year;
+        this.mileage = mileage;
+        totalVehiclesOnParking++;
+        totalFleetMileage += mileage;
+    }
+
+    // Пункт 11: Статическая функция вывода статистики
+    public static void printFleetStatistics() {
+        System.out.println("\n[STATISTICS] Машин на парковке: " + totalVehiclesOnParking);
+        System.out.println("[STATISTICS] Суммарный пробег автопарка: " + totalFleetMileage + " км.\n");
+    }
+
+    // Пункт 1: Абстрактная функция
+    public abstract void startEngine();
+
+    // Пункт 6: Обычная функция из класса родителя
+    public void displayGeneralInfo() {
+        System.out.println("Марка: " + brand + ", Год: " + year + ", Пробег: " + mileage + " км.");
+    }
+
+    // Пункт 7: Метод рандомизации полей
+    public void randomize() {
+        String[] brands = {"Toyota", "Ford", "BMW", "Mercedes", "Renault", "Hyundai"};
+        Random rand = new Random();
+        this.brand = brands[rand.nextInt(brands.length)];
+        this.year = 2010 + rand.nextInt(15); // от 2010 до 2024
+        this.mileage = Math.round(rand.nextDouble() * 150000.0 * 10.0) / 10.0;
+        totalFleetMileage += this.mileage;
+    }
+
+    // Пункт 8: Функция ввода полей с клавиатуры
+    public void inputFromKeyboard() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Введите марку: ");
+        this.brand = scanner.nextLine();
+        System.out.print("Введите год выпуска: ");
+        this.year = scanner.nextInt();
+        System.out.print("Введите пробег: ");
+        this.mileage = scanner.nextDouble();
+        totalFleetMileage += this.mileage;
+    }
+
+    // Пункт 9: Функция записи в файл
+    public void writeToFile(PrintWriter writer) {
+        writer.println("Brand: " + brand + ", Year: " + year + ", Mileage: " + mileage);
+    }
+}
+
+
+Bus.java
+
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+public class Bus extends A_Vehicle implements I_CargoCarrier {
+    // Пункт 4: Уникальные поля
+    private int standingPlaces;
+    private int routeNumber;
+
+    public Bus() {
+        super();
+        this.standingPlaces = 30;
+        this.routeNumber = 5;
+    }
+
+    public Bus(String brand, int year, double mileage, int standingPlaces, int routeNumber) {
+        super(brand, year, mileage);
+        this.standingPlaces = standingPlaces;
+        this.routeNumber = routeNumber;
+    }
+
+    @Override
+    public void startEngine() {
+        System.out.println("Автобус маршрута №" + routeNumber + " (" + brand + ") заводит двигатель.");
+    }
+
+    // Пункт 14: Уникальная функция
+    public void announceStop() {
+        System.out.println("-> " + brand + " [Маршрут " + routeNumber + "]: Объявление следующей остановки в салоне.");
+    }
+
+    // Реализация интерфейса I_CargoCarrier (перевозка пассажиров как "живого груза")
+    @Override
+    public void loadCargo(double passengerCount) {
+        System.out.println("-> Автобус " + brand + " принял на борту пассажиров: " + (int)passengerCount);
+    }
+
+    @Override
+    public void unloadCargo() {
+        System.out.println("-> Автобус " + brand + " высадил всех пассажиров на конечной остановке.");
+    }
+
+    @Override
+    public void randomize() {
+        super.randomize();
+        this.standingPlaces = 15 + (int)(Math.random() * 35);
+        this.routeNumber = 1 + (int)(Math.random() * 50);
+    }
+
+    @Override
+    public void inputFromKeyboard() {
+        super.inputFromKeyboard();
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Введите количество стоячих мест: ");
+        this.standingPlaces = scanner.nextInt();
+        System.out.print("Введите номер маршрута: ");
+        this.routeNumber = scanner.nextInt();
+    }
+
+    @Override
+    public void writeToFile(PrintWriter writer) {
+        writer.print("[Bus] ");
+        super.writeToFile(writer);
+        writer.println("   Standing Places: " + standingPlaces + ", Route: " + routeNumber);
+    }
+}
+
+
+ElectricCar.java
+
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+public class ElectricCar extends A_Vehicle implements I_Electric {
+    // Пункт 4: Уникальные поля
+    private double batteryCapacity; // кВт·ч
+    private double autopilotVersion;
+
+    public ElectricCar() {
+        super();
+        this.batteryCapacity = 75.0;
+        this.autopilotVersion = 4.0;
+    }
+
+    public ElectricCar(String brand, int year, double mileage, double batteryCapacity, double autopilotVersion) {
+        super(brand, year, mileage);
+        this.batteryCapacity = batteryCapacity;
+        this.autopilotVersion = autopilotVersion;
+    }
+
+    @Override
+    public void startEngine() {
+        System.out.println("Электромобиль " + brand + " активирован бесшумно (электромотор готов).");
+    }
+
+    // Пункт 14: Уникальная функция
+    public void enableAutopilot() {
+        System.out.println("-> " + brand + ": Автопилот v" + autopilotVersion + " включен. Управление передано ИИ.");
+    }
+
+    // Реализация интерфейса I_Electric
+    @Override
+    public void chargeBattery() {
+        System.out.println("-> " + brand + ": Подключена быстрая зарядка. Батарея " + batteryCapacity + " кВт·ч заряжается.");
+    }
+
+    @Override
+    public int getBatteryLevel() {
+        return 85; // условный текущий заряд в %
+    }
+
+    @Override
+    public void randomize() {
+        super.randomize();
+        this.batteryCapacity = 50.0 + Math.random() * 50.0;
+        this.autopilotVersion = 2.0 + Math.floor(Math.random() * 4) + 0.5;
+    }
+
+    @Override
+    public void inputFromKeyboard() {
+        super.inputFromKeyboard();
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Введите емкость батареи (кВт·ч): ");
+        this.batteryCapacity = scanner.nextDouble();
+        System.out.print("Введите версию автопилота: ");
+        this.autopilotVersion = scanner.nextDouble();
+    }
+
+    @Override
+    public void writeToFile(PrintWriter writer) {
+        writer.print("[ElectricCar] ");
+        super.writeToFile(writer);
+        writer.println("   Battery: " + batteryCapacity + " kWh, Autopilot: v" + autopilotVersion);
+    }
+}
+
+
+FleetConfig.java
+
+public final class FleetConfig {
+    public static final String COMPANY_NAME = "CityFleet Management"; // final переменная
+
+    public static final void printFleetRules() { // final функция
+        System.out.println("--- Правила автопарка (" + COMPANY_NAME + ") ---");
+        System.out.println("1. Все транспортные средства проходят ежедневный техосмотр.");
+        System.out.println("2. Запрещена эксплуатация с неисправной тормозной системой.");
+    }
+}
+
+
+I_CargoCarrier.java
+
+public interface I_CargoCarrier {
+    void loadCargo(double weight);
+    void unloadCargo();
+}
+
+
+I_Electric.java
+
+public interface I_Electric {
+    void chargeBattery();
+    int getBatteryLevel();
+}
+
+
+Main.java
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+
+public class Main {
+    public static void main(String[] args) {
+        // Демонстрация final класса (Пункт 10)
+        FleetConfig.printFleetRules();
+        System.out.println("Компания: " + FleetConfig.COMPANY_NAME + "\n");
+
+        // Пункт 13: Создать вектора объектов с типами: базовый класс && интерфейс
+        ArrayList<A_Vehicle> vehicles = new ArrayList<>();
+        ArrayList<I_Electric> electricVehicles = new ArrayList<>();
+
+        // Заполняем вектор объектов разных наследников (вызываются конструкторы без параметров с рандомом)
+        vehicles.add(new PassengerCar("Toyota Camry", 2022, 45000.0, 5, "Автомат"));
+        vehicles.add(new Truck("Volvo FH", 2020, 180000.0, 25.0, 4));
+        vehicles.add(new ElectricCar("Tesla Model S", 2023, 15000.0, 100.0, 4.5));
+        vehicles.add(new Bus("Mercedes-Benz Conecto", 2021, 95000.0, 40, 23));
+
+        // Добавляем еще один объект через дефолтный конструктор (проверка рандомизатора)
+        vehicles.add(new ElectricCar());
+
+        A_Vehicle mySuuperCar = new Truck();
+        ((Truck)mySuuperCar).dumpCargo();
+
+
+        // Заполняем вектор интерфейса I_Electric
+        for (A_Vehicle v : vehicles) {
+            if (v instanceof I_Electric) {
+                electricVehicles.add((I_Electric) v);
+            }
+        }
+
+        // Вывод статистики парковки (Пункт 11)
+        A_Vehicle.printFleetStatistics();
+
+        // Пункт 14: В функции main для созданных объектов вызвать уникальные функции, полиморфизм
+        System.out.println("=== ДЕМОНСТРАЦИЯ ПОЛИМОРФИЗМА И УНИКАЛЬНЫХ ФУНКЦИЙ ===");
+        for (A_Vehicle v : vehicles) {
+            v.displayGeneralInfo(); // функция родителя (Пункт 6)
+            v.startEngine();        // полиморфный вызов абстрактной функции
+
+            // Пункт 12 и 14: Использовать instanceof и преобразование типов для вызова уникальных методов
+            if (v instanceof PassengerCar) {
+                ((PassengerCar) v).activateCruiseControl();
+            } else if (v instanceof Truck) {
+                Truck truck = (Truck) v; // преобразование типа
+                truck.loadCargo(18.5);
+                truck.dumpCargo();
+            } else if (v instanceof ElectricCar) {
+                ElectricCar ec = (ElectricCar) v;
+                ec.enableAutopilot();
+                ec.chargeBattery();
+            } else if (v instanceof Bus) {
+                Bus bus = (Bus) v;
+                bus.loadCargo(45);
+                bus.announceStop();
+            }
+            System.out.println("--------------------------------------------------");
+        }
+
+        // Демонстрация работы с интерфейсом I_Electric
+        System.out.println("\n=== ОБЪЕКТЫ ИНТЕРФЕЙСА ELECTRIC ===");
+        for (I_Electric el : electricVehicles) {
+            el.chargeBattery();
+            System.out.println("Текущий заряд батареи: " + el.getBatteryLevel() + "%");
+        }
+
+        // Пункт 9: Запись объектов в файл
+        try (PrintWriter writer = new PrintWriter(new FileWriter("fleet_report.txt"))) {
+            writer.println("=== ОТЧЕТ АВТОПАРКА ===");
+            for (A_Vehicle v : vehicles) {
+                v.writeToFile(writer); // полиморфный вызов записи в файл
+            }
+            System.out.println("\n[INFO] Данные успешно записаны в файл 'fleet_report.txt'.");
+        } catch (IOException e) {
+            System.out.println("[ERROR] Ошибка записи в файл: " + e.getMessage());
+        }
+    }
+}
+
+
+PassengerCar.java
+
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+public class PassengerCar extends A_Vehicle {
+    // Пункт 4: Уникальные поля
+    private int passengerCapacity;
+    private String transmissionType; // "Автомат" или "Механика"
+
+    public PassengerCar() {
+        super();
+        this.passengerCapacity = 5;
+        this.transmissionType = "Автомат";
+    }
+
+    public PassengerCar(String brand, int year, double mileage, int passengerCapacity, String transmissionType) {
+        super(brand, year, mileage);
+        this.passengerCapacity = passengerCapacity;
+        this.transmissionType = transmissionType;
+    }
+
+    @Override
+    public void startEngine() {
+        System.out.println("Легковой автомобиль " + brand + " плавно заводит тихий двигатель.");
+    }
+
+    // Пункт 14: Уникальная функция
+    public void activateCruiseControl() {
+        System.out.println("-> " + brand + ": Круиз-контроль успешно активирован на скорости 110 км/ч.");
+    }
+
+    @Override
+    public void randomize() {
+        super.randomize();
+        this.passengerCapacity = 2 + (int)(Math.random() * 5);
+        this.transmissionType = Math.random() > 0.5 ? "Автомат" : "Механика";
+    }
+
+    @Override
+    public void inputFromKeyboard() {
+        super.inputFromKeyboard();
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Введите вместимость пассажиров: ");
+        this.passengerCapacity = scanner.nextInt();
+        scanner.nextLine(); // очистка буфера
+        System.out.print("Введите тип коробки передач: ");
+        this.transmissionType = scanner.nextLine();
+    }
+
+    @Override
+    public void writeToFile(PrintWriter writer) {
+        writer.print("[PassengerCar] ");
+        super.writeToFile(writer);
+        writer.println("   Capacity: " + passengerCapacity + ", Transmission: " + transmissionType);
+    }
+}
+
+
+
+
+//        PassengerCar myCar = new PassengerCar();
+//        vehicles.add(myCar);
+//        myCar.inputFromKeyboard();
+
+
+Truck.java
+
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+public class Truck extends A_Vehicle implements I_CargoCarrier {
+    // Пункт 4: Уникальные поля
+    private double maxLoadCapacity; // в тоннах
+    private int axleCount;          // количество осей
+
+    public Truck() {
+        super();
+        this.maxLoadCapacity = 20.0;
+        this.axleCount = 4;
+    }
+
+    public Truck(String brand, int year, double mileage, double maxLoadCapacity, int axleCount) {
+        super(brand, year, mileage);
+        this.maxLoadCapacity = maxLoadCapacity;
+        this.axleCount = axleCount;
+    }
+
+    @Override
+    public void startEngine() {
+        System.out.println("Грузовик " + brand + " запускает мощный дизельный двигатель с гудком.");
+    }
+
+    // Пункт 14: Уникальная функция
+    public void dumpCargo() {
+        System.out.println("-> " + brand + ": Кузов поднят, груз успешно выгружен.");
+    }
+
+    // Реализация интерфейса I_CargoCarrier
+    @Override
+    public void loadCargo(double weight) {
+        System.out.println("-> " + brand + ": Загружено " + weight + " тонн (Максимум: " + maxLoadCapacity + " т).");
+    }
+
+    @Override
+    public void unloadCargo() {
+        System.out.println("-> " + brand + ": Произведена полная разгрузка кузова.");
+    }
+
+    @Override
+    public void randomize() {
+        super.randomize();
+        this.maxLoadCapacity = 10.0 + Math.random() * 30.0;
+        this.axleCount = 2 + (int)(Math.random() * 4);
+    }
+
+    @Override
+    public void inputFromKeyboard() {
+        super.inputFromKeyboard();
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Введите макс. грузоподъемность (тонн): ");
+        this.maxLoadCapacity = scanner.nextDouble();
+        System.out.print("Введите количество осей: ");
+        this.axleCount = scanner.nextInt();
+    }
+
+    @Override
+    public void writeToFile(PrintWriter writer) {
+        writer.print("[Truck] ");
+        super.writeToFile(writer);
+        writer.println("   Max Load: " + maxLoadCapacity + "t, Axles: " + axleCount);
+    }
+}
+
+

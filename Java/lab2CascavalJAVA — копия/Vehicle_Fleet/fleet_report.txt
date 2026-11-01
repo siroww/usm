@@ -1,0 +1,11 @@
+=== ОТЧЕТ АВТОПАРКА ===
+[PassengerCar] Brand: Toyota Camry, Year: 2022, Mileage: 45000.0
+   Capacity: 5, Transmission: Автомат
+[Truck] Brand: Volvo FH, Year: 2020, Mileage: 180000.0
+   Max Load: 25.0t, Axles: 4
+[ElectricCar] Brand: Tesla Model S, Year: 2023, Mileage: 15000.0
+   Battery: 100.0 kWh, Autopilot: v4.5
+[Bus] Brand: Mercedes-Benz Conecto, Year: 2021, Mileage: 95000.0
+   Standing Places: 40, Route: 23
+[ElectricCar] Brand: Ford, Year: 2015, Mileage: 15197.4
+   Battery: 75.0 kWh, Autopilot: v4.0
