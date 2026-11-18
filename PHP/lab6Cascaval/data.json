@@ -1,0 +1,52 @@
+[
+    {
+        "id": "6af9e1aa8659c",
+        "title": "фыв",
+        "description": "фывфыв",
+        "category": "Учеба",
+        "status": "Да",
+        "target_date": "2026-10-30",
+        "price": 213,
+        "created_at": "2026-11-15 16:45:30"
+    },
+    {
+        "id": "6af9e1c427ee8",
+        "title": "3у2",
+        "description": "у12вц",
+        "category": "Учеба",
+        "status": "Нет",
+        "target_date": "2026-11-06",
+        "price": 214,
+        "created_at": "2026-11-15 16:45:56"
+    },
+    {
+        "id": "6af9e1cdc7e3f",
+        "title": "ам уа",
+        "description": "ау2312",
+        "category": "Работа",
+        "status": "Да",
+        "target_date": "2026-10-30",
+        "price": 13,
+        "created_at": "2026-11-15 16:46:05"
+    },
+    {
+        "id": "6af9e1d6c409d",
+        "title": "13ка",
+        "description": "3а21й",
+        "category": "Работа",
+        "status": "Нет",
+        "target_date": "2026-10-31",
+        "price": 321,
+        "created_at": "2026-11-15 16:46:14"
+    },
+    {
+        "id": "6af9e1df9b85b",
+        "title": "фыа",
+        "description": "123ку1а",
+        "category": "Работа",
+        "status": "Нет",
+        "target_date": "2026-10-30",
+        "price": 2133,
+        "created_at": "2026-11-15 16:46:23"
+    }
+]
